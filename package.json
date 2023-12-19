@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@expo/webpack-config": "^19.0.0",
+    "@react-native-async-storage/async-storage": "1.18.2",
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/native-stack": "^6.9.17",
     "@react-navigation/stack": "^6.3.20",
@@ -29,7 +30,8 @@
     "react-native-safe-area-view": "github:react-native-community/react-native-safe-area-view",
     "react-native-screens": "~3.22.0",
     "react-native-vector-icons": "^10.0.2",
-    "react-native-web": "~0.19.6"
+    "react-native-web": "~0.19.6",
+    "spotify-web-api-node": "^5.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

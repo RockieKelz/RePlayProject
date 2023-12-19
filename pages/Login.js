@@ -1,7 +1,12 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
+import { Pressable, Text, StyleSheet, View} from 'react-native';
+import { handleLoginAuth, saveAuthToken }  from "../utils/spotify";
 
-const LoginScreen= ({navigation}) =>  {
+const Login= () =>  {
+  const handleLogin = () => {
+    handleLoginAuth(); //redirects and allows user to authorize spotify profile usage
+    saveAuthToken(); //gets and saves the access token from spotify
+  };
 
   return (
     <View style = {styles.container}>
@@ -9,20 +14,20 @@ const LoginScreen= ({navigation}) =>  {
         RePlay App
       </Text>
       {/* Button that will be used to initiate Spotify Login Authorization */}
-      <TouchableOpacity 
+      <Pressable 
         style={styles.btn} 
-        onPress={() => navigation.navigate('Home')}>
+        onPress={handleLogin}>
         {/* Text to be displayed within the 'button'. */}
         <Text 
           style={styles.btnText}>
             Login to Spotify
             </Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>  
   )
 }
 
-export default LoginScreen
+export default Login
 
 const styles = StyleSheet.create({
   container: {
