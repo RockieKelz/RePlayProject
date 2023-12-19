@@ -1,28 +1,31 @@
-import React, { useEffect } from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import LoginScreen from "./pages/Login";
+import React, { useEffect, useState } from 'react';
+import Login from "./pages/Login";
 import Home from "./pages/Home";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Stack = createNativeStackNavigator();
-
-const App = () => {
+function App () {
   //read and set token using state provider
-  
+ const [token, setToken] = useState(null);
+
+ useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const storedToken = await AsyncStorage.getItem("access_token");
+        if (storedToken !== null) {
+          setToken(storedToken);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchToken();
+ }, []);
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-      <Stack.Screen 
-          name="Login" 
-          component={LoginScreen} 
-          options={ {headerShown: false}}
-          />
-          <Stack.Screen
-          name="Home"
-          component={Home}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+      token ?
+            <Home />
+            :
+            <Login />
   );
 };
 

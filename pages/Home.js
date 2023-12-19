@@ -1,21 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { Animated, SafeAreaView,Text, StyleSheet, View } from 'react-native';
+import React from "react";
+import { Pressable, SafeAreaView,Text, StyleSheet, View } from 'react-native';
 import { ScrollView } from "react-native-gesture-handler";
+import { logOut } from "../utils/spotify";
 
-const Home = ({navigation}) => {
+const Home = () => {
   {/* Disable the page's automatic header */}
-  useEffect(()=>{
-    navigation.setOptions({
-        headerShown:false
-    })
-  },[])
+  
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        {/* Temporary View Holder for testing screen navigation */}
         <View style={{paddingTop: 200, alignItems:'center', 
                           justifyContent:'center', flex:1}}>
-            <Text> Home Screen Page</Text>
+            <Text style={styles.title}> Home Screen Page</Text>
+            {/*Temporary logout button to test authorization code*/}
+            <Pressable 
+              style={styles.btn} 
+              onPress={logOut}>
+                <Text style={styles.text}>Log Out</Text>
+            </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -31,5 +33,26 @@ const styles = StyleSheet.create({
   subContainer:{
     paddingRight: 15,
     paddingLeft: 15
-  }
+  },
+  title:{
+    fontFamily: "Arial",
+    fontSize: 38
+  },
+  btn: {
+    width: 140,
+    height: 40,
+    borderRadius: 10,
+    borderWidth: 3, 
+    borderColor: 'green', 
+    backgroundColor: 'blue',
+    marginTop: 140,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    letterSpacing: 3,
+  },
 });
