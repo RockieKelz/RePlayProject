@@ -2,24 +2,40 @@ import React from "react";
 import { Pressable, SafeAreaView,Text, StyleSheet, View } from 'react-native';
 import { ScrollView } from "react-native-gesture-handler";
 import { logOut } from "../utils/spotify";
+import { SideBar } from "../components/SideBar";
+import { LinearGradient } from 'expo-linear-gradient'
+
 
 const Home = () => {
   {/* Disable the page's automatic header */}
   
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <View style={{paddingTop: 200, alignItems:'center', 
-                          justifyContent:'center', flex:1}}>
-            <Text style={styles.title}> Home Screen Page</Text>
-            {/*Temporary logout button to test authorization code*/}
-            <Pressable 
-              style={styles.btn} 
-              onPress={logOut}>
-                <Text style={styles.text}>Log Out</Text>
-            </Pressable>
-        </View>
-      </ScrollView>
+      <View style= {styles.subContainer}>
+        <SideBar />
+        <LinearGradient 
+              colors={['rgba(0, 17, 236, 1)',"rgba(12,90,249,1)", 'rgba(48,138,239,1)','rgba(0,255,96,1)']} 
+              start={[0.5, .02]}
+              end={[.75, .75]}
+              locations={[0.02, 0.27, 0.84,0.96,0.99]}
+              style={styles.linearGradient}>
+          <ScrollView>
+            {/*Temporary view that will display Home Screen's content*/}            
+            <View style={{paddingTop: 200, alignItems:'center', 
+                              justifyContent:'center', flex:1}}>
+                <Text style={styles.title}> Home Screen Page</Text>
+                {/*Temporary logout button to test authorization code*/}
+                <Pressable 
+                  style={styles.btn} 
+                  onPress={logOut}>
+                    <Text style={styles.text}>Log Out</Text>
+                </Pressable>
+            </View>
+          </ScrollView>
+        </LinearGradient>
+      </View>
+      <View style={styles.footerLine} />
+    {/*Footer area to display music player*/}            
     </SafeAreaView>
   )
 }
@@ -29,15 +45,26 @@ export default Home
 const styles = StyleSheet.create({
   container:{
     flex: 1,
+    flexDirection: 'column',
+    backgroundColor: 'blue',
   },
+  /*view that will hold side menu and main content*/
   subContainer:{
-    paddingRight: 15,
-    paddingLeft: 15
+    display: 'flex',
+    flexDirection: 'row',
+    height: '85%'
+  },
+  /*holder for the colored background*/
+  linearGradient:{
+    flex: 1,
+    opacity: 0.85,
+    maxHeight: '100%',
   },
   title:{
     fontFamily: "Arial",
     fontSize: 38
   },
+  /*logout button */
   btn: {
     width: 140,
     height: 40,
@@ -55,4 +82,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     letterSpacing: 3,
   },
+  /*line that separates the bottom player from the upper components */
+  footerLine:{
+    borderBottomColor: "#7001b1",
+    borderBottomWidth: 5,
+    width: "100%",
+  }
 });
