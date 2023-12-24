@@ -6,13 +6,13 @@ import { SideBar } from "../components/SideBar";
 import { LinearGradient } from 'expo-linear-gradient'
 
 
-const Home = () => {
+const Home = ({navigation}) => {
   {/* Disable the page's automatic header */}
   
   return (
     <SafeAreaView style={styles.container}>
       <View style= {styles.subContainer}>
-        <SideBar />
+        <SideBar navigation={navigation} />
         <LinearGradient 
               colors={['rgba(0, 17, 236, 1)',"rgba(12,90,249,1)", 'rgba(48,138,239,1)','rgba(0,255,96,1)']} 
               start={[0.5, .02]}

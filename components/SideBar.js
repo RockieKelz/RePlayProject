@@ -1,10 +1,10 @@
 import React from "react";
-import { Text, StyleSheet, View } from 'react-native';
+import { Text, StyleSheet, View, Pressable } from 'react-native';
 import { MdHomeFilled, MdSearch } from "react-icons/md";
 import { LinearGradient } from 'expo-linear-gradient'
 import { IoLibrary } from "react-icons/io5";
 
-export function SideBar() {
+export function SideBar({navigation}) {
     return (
         <LinearGradient 
             colors={["#EEEEEE", 'rgba(15,251,35,1)','#00F260', '#0575E6']}
@@ -13,27 +13,30 @@ export function SideBar() {
             style={Container.linearGradient}
         >
             <View style ={Container.menuList}>
-                <View style = {Container.rowItems}>
+                <Pressable style = {Container.rowItems}
+                onPress={() => navigation.navigate('Home')}>
                     {/* Home navigation */}
                     <MdHomeFilled />
                     <Text style={Container.text}>
                         Home
                     </Text>
-                </View>
-                <View style = {Container.rowItems}>
+                </Pressable>
+                <Pressable style = {Container.rowItems}
+                    onPress={() => navigation.navigate('Search')}>
                     {/* Search navigation*/}
                     <MdSearch />
                     <Text style={Container.text}>
                         Search
                     </Text>
-                </View>
-                <View style = {Container.rowItems}>
+                </Pressable>
+                <Pressable style = {Container.rowItems}
+                onPress={() => navigation.navigate('Library')}>
                     {/* Library navigation*/}
                     <IoLibrary />
                     <Text style={Container.text}>
                         Library
                     </Text>
-                </View>
+                </Pressable>
                 <Text style={Container.playlistText}>
                     Playlists
                 </Text>
