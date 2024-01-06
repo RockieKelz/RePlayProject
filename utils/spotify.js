@@ -1,22 +1,27 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios'
 
 /*=======================================================
 =            Authorization Logic            =
 =======================================================*/
 const authEndpoint = "https://accounts.spotify.com/authorize";
-const redirectUri = "http://localhost:19006";
+const redirectUri = "http://localhost:19006/PostLogin";
 const clientId = "fa3defefdad641c9bc8540d03281e562";
 const params = new URLSearchParams(window.location.search);
-const code = params.get("code");
+export const code = params.get("code");
 const scopes = [
-      "user-read-currently-playing",
-      "user-top-read",
-      "user-modify-playback-state",
-      "streaming",
-      "user-read-email",
-      "user-read-private",
-      "user-library-read",
-      "user-library-modify"
+  "user-read-currently-playing",
+  "user-read-recently-played",
+  "user-read-playback-state",
+  "user-top-read",
+  "user-modify-playback-state",
+  "streaming",
+  "user-read-email",
+  "user-read-private",
+  "user-library-read",
+  "user-library-modify",
+  "playlist-read-private",
+  "playlist-read-collaborative"
 ];
 
 //create code verifier
@@ -46,7 +51,6 @@ export const handleLoginAuth =async ()=>{
     const challenge = await generateCodeChallenge(verifier);
 
     AsyncStorage.setItem("verifier", verifier);
-
     const params = new URLSearchParams();
     params.append("client_id", clientId);
     params.append("response_type", "code");
@@ -64,11 +68,11 @@ export const handleLoginAuth =async ()=>{
 
 //get the access token from spotify 
 export async function getAccessToken() {
-  const verifier = AsyncStorage.getItem("verifier");
+  const verifier = await AsyncStorage.getItem("verifier");
 
   const params = new URLSearchParams();
   params.append("client_id", clientId);
-  params.append("grant_type", "authorization_code");
+  params.append("grant_type", 'authorization_code');
   params.append("code", code);
   params.append("redirect_uri", redirectUri);
   params.append("code_verifier", verifier);
@@ -79,16 +83,18 @@ export async function getAccessToken() {
       body: params
   });
 
-  const { access_token } = await result.json();
-  return access_token;
+  const access_token = await result.json();
+  return access_token.access_token;
 }
 
+let savedToken = await AsyncStorage.getItem("access_token");
 //save the access token using async storage
 export const saveAuthToken = async () => {
 
-  const accessToken = await getAccessToken(clientId, code);
+  const accessToken = await getAccessToken();
   try {
     await AsyncStorage.setItem("access_token", accessToken);
+    savedToken = accessToken
   } catch {
     console.log(error);
   }
@@ -99,4 +105,36 @@ export const logOut = () => {
   AsyncStorage.removeItem('access_token')
   AsyncStorage.removeItem('refresh_token')
   window.location.href='/'
+}
+const SPOTIFY_API_URL = "https://api.spotify.com/v1";
+
+export async function fetchProfile() {
+  const response = await fetch(`${SPOTIFY_API_URL}/me`, {
+      method: "GET", 
+      headers: { Authorization: `Bearer ${savedToken}`,}
+  });
+  console.log(response);
+  return await response.json();
+}
+
+export async function fetchPlaylists(userId) {
+  const response = await fetch(`${SPOTIFY_API_URL}/users/${userId}/playlists`, {
+    method: "GET", 
+    headers: {
+          'Authorization': `Bearer ${savedToken}`
+      }
+  });
+  console.log(response);
+  return response.data;
+}
+
+export async function fetchRecentlyPlayed() {
+  const response = await fetch(`${SPOTIFY_API_URL}/me/player/recently-played?limit=10`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${savedToken}`
+        }
+  });
+  console.log(response);
+  return await response.json();
 }

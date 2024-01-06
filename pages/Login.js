@@ -5,7 +5,6 @@ import { handleLoginAuth, saveAuthToken }  from "../utils/spotify";
 const Login= () =>  {
   const handleLogin = () => {
     handleLoginAuth(); //redirects and allows user to authorize spotify profile usage
-    saveAuthToken(); //gets and saves the access token from spotify
   };
 
   return (
