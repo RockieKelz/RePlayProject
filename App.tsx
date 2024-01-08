@@ -6,26 +6,29 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LibraryScreen from './pages/Library';
+import { reducerCaseActions } from './utils/constants';
+import { useStateProvider } from './utils/stateprovider';
 
 function App () {
   const Stack = createNativeStackNavigator();
-  //read and set token using state provider
- const [token, setToken] = useState(null);
 
- useEffect(() => {
+  //read and set token state using state provider with reducer
+  const [{ token }, dispatch] = useStateProvider();
+
+  useEffect(() => {
     const fetchToken = async () => {
-      try {
-        const storedToken = await AsyncStorage.getItem("access_token");
-        if (storedToken !== null) {
-          setToken(storedToken);
+      try { //try to get access token from async storage
+        const token = await AsyncStorage.getItem("access_token");
+        if (token !== null) { 
+          //dispatch the action to set the token and update state
+          dispatch({ type: reducerCaseActions.SET_TOKEN, token });
         }
       } catch (error) {
         console.log(error);
       }
     };
-
     fetchToken();
- }, []);
+ }, [dispatch, token]);
   return (
       token ?
             <NavigationContainer>
