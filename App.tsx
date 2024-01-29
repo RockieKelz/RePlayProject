@@ -8,27 +8,41 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LibraryScreen from './pages/Library';
 import { reducerCaseActions } from './utils/constants';
 import { useStateProvider } from './utils/stateprovider';
+import { code, saveAuthToken } from './utils/spotify';
+import { initialState } from './utils/reducer';
 
 function App () {
   const Stack = createNativeStackNavigator();
-
+  
   //read and set token state using state provider with reducer
-  const [{ token }, dispatch] = useStateProvider();
-
+  var [{ token }, dispatch] = useStateProvider();
   useEffect(() => {
     const fetchToken = async () => {
-      try { //try to get access token from async storage
-        const token = await AsyncStorage.getItem("access_token");
-        if (token !== null) { 
-          //dispatch the action to set the token and update state
+      //try to get access token from async storage
+      var storedTokenState = await AsyncStorage.getItem("access_token");
+      //retrieve a token from spotify and save it if there isn't one granted
+      if  (storedTokenState == null) {
+          if (code) {
+            try { 
+              await saveAuthToken()
+              const token = await AsyncStorage.getItem("access_token");
+              if (token !== null) { 
+                //dispatch the action to set the token and update state
+                dispatch({ type: reducerCaseActions.SET_TOKEN, token });
+              }
+            } catch (error) {
+              console.log(error);
+            }
+          }
+        } else {
+          //if there is already a token saved, update the state
+          token = storedTokenState;
           dispatch({ type: reducerCaseActions.SET_TOKEN, token });
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
+        };
+      };
     fetchToken();
- }, [dispatch, token]);
+    }, [dispatch, token]);
+
   return (
       token ?
             <NavigationContainer>

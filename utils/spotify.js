@@ -7,16 +7,20 @@ const authEndpoint = "https://accounts.spotify.com/authorize";
 const redirectUri = "http://localhost:19006";
 const clientId = "fa3defefdad641c9bc8540d03281e562";
 const params = new URLSearchParams(window.location.search);
-const code = params.get("code");
+export const code = params.get("code");
 const scopes = [
-      "user-read-currently-playing",
-      "user-top-read",
-      "user-modify-playback-state",
-      "streaming",
-      "user-read-email",
-      "user-read-private",
-      "user-library-read",
-      "user-library-modify"
+  "user-read-currently-playing",
+  "user-read-recently-played",
+  "user-read-playback-state",
+  "user-top-read",
+  "user-modify-playback-state",
+  "streaming",
+  "user-read-email",
+  "user-read-private",
+  "user-library-read",
+  "user-library-modify",
+  "playlist-read-private",
+  "playlist-read-collaborative"
 ];
 
 //create code verifier
@@ -46,7 +50,6 @@ export const handleLoginAuth =async ()=>{
     const challenge = await generateCodeChallenge(verifier);
 
     AsyncStorage.setItem("verifier", verifier);
-
     const params = new URLSearchParams();
     params.append("client_id", clientId);
     params.append("response_type", "code");
@@ -64,11 +67,11 @@ export const handleLoginAuth =async ()=>{
 
 //get the access token from spotify 
 export async function getAccessToken() {
-  const verifier = AsyncStorage.getItem("verifier");
+  const verifier = await AsyncStorage.getItem("verifier");
 
   const params = new URLSearchParams();
   params.append("client_id", clientId);
-  params.append("grant_type", "authorization_code");
+  params.append("grant_type", 'authorization_code');
   params.append("code", code);
   params.append("redirect_uri", redirectUri);
   params.append("code_verifier", verifier);
@@ -79,24 +82,24 @@ export async function getAccessToken() {
       body: params
   });
 
-  const { access_token } = await result.json();
-  return access_token;
+  const access_token = await result.json();
+  return access_token.access_token;
 }
 
 //save the access token using async storage
 export const saveAuthToken = async () => {
-
-  const accessToken = await getAccessToken(clientId, code);
-  try {
-    await AsyncStorage.setItem("access_token", accessToken);
-  } catch {
-    console.log(error);
-  }
+    const accessToken = await getAccessToken();
+    try {
+      await AsyncStorage.setItem("access_token", accessToken);
+    } catch (error) {
+      console.log(error);
+    }
 }
 
 export const logOut = () => {
   AsyncStorage.removeItem('token_timestamp')
   AsyncStorage.removeItem('access_token')
   AsyncStorage.removeItem('refresh_token')
+  AsyncStorage.removeItem('session')
   window.location.href='/'
 }

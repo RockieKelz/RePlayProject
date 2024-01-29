@@ -1,11 +1,11 @@
 import React from "react";
 import { Pressable, Text, StyleSheet, View} from 'react-native';
 import { handleLoginAuth, saveAuthToken }  from "../utils/spotify";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login= () =>  {
-  const handleLogin = () => {
+  const handleLogin = async () => {
     handleLoginAuth(); //redirects and allows user to authorize spotify profile usage
-    saveAuthToken(); //gets and saves the access token from spotify
   };
 
   return (
