@@ -61,9 +61,10 @@ This use effect will be deleted once the Recently Played section is completed */
                 </>)}
                 </Text>
                 {/*display recently played songs if there are any*/}
+                {recentPlays && recentPlays.recentlyPlayed.items ? (
                 <Text style={styles.title}>
                    Recently Played Songs
-                </Text>
+                </Text> ) : (<></>)}
                 <View style={styles.cardContainer}>
                   {/*create card for each song*/}
                 {recentPlays && recentPlays.recentlyPlayed.items?.map((item, index) => (
@@ -176,7 +177,19 @@ const styles = StyleSheet.create({
   },
   title:{
     fontFamily: "Arial",
-    fontSize: 22
+    fontSize: 22,
+    fontWeight: '700',
+    color: 'rgba(112, 1, 177, 1)',
+    tintColor: 'black',
+    backgroundColor: 'rgba(50, 242, 134, 0.77)',
+    height: '40%',
+    width: '35%',
+    maxWidth: 275,
+    minWidth: 135,
+    borderTopRightRadius: 12,
+    borderBottomLeftRadius: 12,
+    padding: 10,
+    margin: 15
   },
   /*logout */
   btn: {
@@ -189,6 +202,7 @@ const styles = StyleSheet.create({
     marginTop: 140,
     alignItems: 'center',
     justifyContent: 'center',
+    margin:15,
   },
   /*card like views*/
   cardContainer: {
@@ -217,15 +231,16 @@ const styles = StyleSheet.create({
   },
   labelName: {
     fontSize: 14,
-    color: '#666',
+    color: '#rgba(96, 68, 109, 1)',
   },
   /*song data views*/
   primaryName: {
     fontSize: 15,
-    color: 'black',
     fontWeight: 'bold',
     marginBottom: 4,
-    textAlign: 'center'
+    textAlign: 'center',
+    color: 'rgba(98, 4, 156, 1)',
+    tintColor: 'black',
   },
   albumImage: {
     width: 150,
@@ -234,16 +249,18 @@ const styles = StyleSheet.create({
    },
    subName: {
     fontSize: 14,
-    color: 'black',
+    color: 'rgba(71, 4, 112, 1)',
     fontWeight: '600',
     marginBottom: 4,
+    tintColor: 'black',
   },
   /*addt'l sections*/
    logoutText: {
-    color: 'white',
+    color: 'rgba(200, 245, 255,1)',
     fontSize: 18,
     fontWeight: 'bold',
     letterSpacing: 3,
+    margin: 10,
   },
   /*line that separates the bottom player from the upper components */
   footerLine:{
