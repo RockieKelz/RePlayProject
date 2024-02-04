@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { Image, Pressable, SafeAreaView,Text, StyleSheet, View } from 'react-native';
+import { FlatList, Image, Pressable, SafeAreaView,Text, StyleSheet, View } from 'react-native';
 import { ScrollView } from "react-native-gesture-handler";
 import TextTicker from 'react-native-text-ticker';
 import { fetchPlaylists, fetchProfile, fetchRecentlyPlayed, getRecentlyPlayed, logOut } from "../utils/spotify";
@@ -40,6 +40,78 @@ This use effect will be deleted once the Recently Played section is completed */
   }
 }, [recentPlays, user]);
 
+  /* create a song card that will display song's data */
+  const SongCard = ({ item }) => (
+    <View style={styles.card}>
+      {/* song's information:
+       SONG NAME as card's header*/}
+      <View style={{ width: 145, height: 30 }}>
+        <TextTicker /* Looping scroll for track name */
+          style={styles.primaryName}
+          duration={7500}
+          animationType={'auto'}
+          marqueeDelay={1250}
+          repeatSpacer={65}
+        >
+          {item.track.name}
+        </TextTicker>
+      </View>
+      {/* =========================================================
+            TO DO: DISPLAY DEFAULT IMAGE FOR WHEN THERE IS NO ALBUM IMAGES
+            =============================================================*/}
+      {item.track.album.images[0] && (
+        <Image
+          source={{ uri: item.track.album.images[0].url }}
+          style={styles.albumImage}
+        />
+      )}
+      {/* Album and Artist info as subheaders*/}
+      <View style={{ width: 145, flexDirection: 'row' }}>
+        <Text style={styles.labelName}>Artist: </Text>
+        <View style={{ width: 105 }}>
+          <TextTicker /* bouncing horizontal scroll for artist(s) */
+            style={styles.subName}
+            duration={4500}
+            animationType={'bounce'}
+            marqueeDelay={1250}
+            repeatSpacer={65}
+          >
+            {/*Check if there's multiple artists and separate their names*/}
+            {item.track.artists.length > 1 ? (
+              item.track.artists.map((artist, index) => (
+                <Text key={index}>
+                  {artist.name} {index == item.track.artists.length - 1 ? (
+                    <Text> {" "} </Text>
+                  ) : (
+                    <Text>, </Text>
+                  )}
+                </Text>
+              ))
+            ) : (
+              <Text>
+                {item.track.artists[0].name}
+              </Text>
+            )}
+          </TextTicker>
+        </View>
+      </View>
+      <View style={{ width: 146, flexDirection: 'row' }}>
+        <Text style={styles.labelName}>Album: </Text>
+        <View style={{ width: 100 }}>
+          <TextTicker /* bouncing horizontal scroll for artist(s) */
+            style={styles.subName}
+            duration={7700}
+            animationType={'bounce'}
+            marqueeDelay={1250}
+            repeatSpacer={65}
+          >
+            {item.track.album.name}
+          </TextTicker>
+        </View>
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <View style= {styles.subContainer}>
@@ -56,88 +128,33 @@ This use effect will be deleted once the Recently Played section is completed */
                               justifyContent:'center', flex:1}}>
                 <Text style={styles.title}> Welcome
                 {/*display username is user isn't null*/}
-                {user && (<>
-                <Text> {user.displayName}</Text>
-                </>)}
+                  {user && (<>
+                    <Text> {user.displayName}</Text>
+                  </>)}
                 </Text>
                 {/*display recently played songs if there are any*/}
                 {recentPlays && recentPlays.recentlyPlayed.items ? (
+                  <>
                 <Text style={styles.title}>
                    Recently Played Songs
-                </Text> ) : (<></>)}
-                <View style={styles.cardContainer}>
-                  {/*create card for each song*/}
-                {recentPlays && recentPlays.recentlyPlayed.items?.map((item, index) => (
-                  <View 
-                    key ={index}
-                    style={styles.card}>
-                      {/*song's information:
-                        SONG NAME as card's header*/}
-                      <View style={{ width: 145, height: 30 }}>
-                        <TextTicker /* Looping scroll for track name */
-                          style={styles.primaryName}
-                          duration={7500}
-                          animationType={'auto'}
-                          marqueeDelay={1250}
-                          repeatSpacer={65}>
-                        {item.track.name}
-                        </TextTicker>
-                      </View>
-                      {/* =========================================================
-                     
-                              TO DO: IF CHECK FOR WHEN THERE IS NO ALBUM IMAGES
-                     
-                     =============================================================*/}
-                      {item.track.album.images[0] && (<>
-                      <Image 
-                        source={{uri: item.track.album.images[0].url}}
-                        style={styles.albumImage} />
-                        </>)}
-                                              
-                      {/*Album and Artist info as subheaders*/}
-                      <View style ={{width:145, flexDirection: 'row'}}>
-                        <Text style={styles.labelName}>Artist: </Text>
-                        <View style ={{width:105}}>
-                          <TextTicker /* bouncing horizontal scroll for artist(s) */
-                            style = {styles.subName}
-                            duration={4500}
-                            animationType={'bounce'}
-                            marqueeDelay={1250}
-                            repeatSpacer={65}>
-                              {/*Check if there's multiple artists and separate their names*/}
-                              {item.track.artists.length > 1 ? (
-                              item.track.artists.map((artist, index) => (
-                                <Text key={index}>
-                                  {artist.name} 
-                                  {index == item.track.artists.length - 1 ? (
-                                    <Text> {" "} </Text>
-                                    ) : (
-                                    <Text>, </Text>
-                                  )}
-                                </Text>
-                                ))
-                              ) : (
-                              <Text>
-                                {item.track.artists[0].name}
-                              </Text>)}
-                          </TextTicker>
-                        </View>
-                      </View>
-                      <View style ={{width:146, flexDirection: 'row'}}>
-                        <Text style={styles.labelName}>Album: </Text>
-                        <View style ={{width:100}}>
-                          <TextTicker  /* bouncing horizontal scroll for album */
-                            style = {styles.subName}
-                            duration={7700}
-                            animationType={'bounce'}
-                            marqueeDelay={1250}
-                            repeatSpacer={65}>
-                              {item.track.album.name}
-                          </TextTicker>
-                        </View>
-                      </View>
-                  </View>
-            ))}
+                </Text>
+                {/* scroll box that will hold 2 rows of recently played song data cards*/}
+                <ScrollView horizontal> 
+                  <>
+                    <View style={styles.cardContainer}>
+                      <FlatList
+                        data={recentPlays.recentlyPlayed.items}
+                        renderItem={({ item }) => 
+                        <SongCard item={item} />}
+                        numColumns={5}
+                        showsHorizontalScrollIndicator={false}
+                        keyExtractor={(item, index) => index.toString()}
+                      />
+                    </View>
+                  </>
+                </ScrollView>
+                </>
+                  ) : (<></>)}
             </View>
             {/*Temporary logout button to test authorization code*/}
             <Pressable 
@@ -145,7 +162,7 @@ This use effect will be deleted once the Recently Played section is completed */
               onPress={logOut}>
                 <Text style={styles.logoutText}>Log Out</Text>
             </Pressable>
-          </View>
+          
         </ScrollView>
       </LinearGradient>
     </View>
@@ -182,14 +199,14 @@ const styles = StyleSheet.create({
     color: 'rgba(112, 1, 177, 1)',
     tintColor: 'black',
     backgroundColor: 'rgba(50, 242, 134, 0.77)',
-    height: '40%',
-    width: '35%',
+    minHeight: 35,
+    maxHeight: 65,
     maxWidth: 275,
     minWidth: 135,
     borderTopRightRadius: 12,
     borderBottomLeftRadius: 12,
     padding: 10,
-    margin: 15
+    margin: 15,
   },
   /*logout */
   btn: {
@@ -212,9 +229,9 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     justifyContent: 'space-between', 
     flexWrap: 'wrap',
+    minWidth: 950
   },
   card:{
-    width: '17%',
     height: 245,
     backgroundColor: 'rgba(0, 245, 255, 0.80)',
     borderRadius: 2,
