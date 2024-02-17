@@ -17,12 +17,27 @@ const Search= ({navigation}) =>  {
           locations={[0.02, 0.27, 0.84,0.96,0.99]}
           style={styles.linearGradient}>
         <ScrollView>
-          <View style={{paddingTop: 200, alignItems:'center', 
-                            justifyContent:'center', flex:1}}>
-            <View>
-              <Text> Search Screen Page</Text>
-            </View>
+              <Text style={styles.title}> Search Default Page</Text>
+          <View 
+            style={styles.btnContainer}>
+              <Pressable 
+                style={styles.btn} 
+                onPress={{}}>
+                    <Text style={styles.text}>Albums</Text>
+              </Pressable>
+              <Pressable 
+                style={styles.btn} 
+                onPress={{}}>
+                    <Text style={styles.text}>Artists</Text>
+              </Pressable>
+              <Pressable 
+                style={styles.btn} 
+                onPress={{}}>
+                    <Text style={styles.text}>Songs</Text>
+              </Pressable>
           </View>
+
+
         </ScrollView>
       </LinearGradient>
     </View>
@@ -40,6 +55,18 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: 'blue',
   },
+  title:{
+    maxWidth: 280,
+    marginLeft: 25,
+    marginTop: 65,
+    fontFamily: "Segoe UI",
+    fontSize: 25,
+    fontWeight: '700',
+    letterSpacing: 1,
+    color: '#7001b1',
+    backgroundColor: 'rgba(0,240,215,.25)',
+    borderRadius: 13,
+  },
   /*view that will hold side menu and main content*/
   subContainer:{
     display: 'flex',
@@ -51,6 +78,30 @@ const styles = StyleSheet.create({
     flex: 1,
     opacity: 0.85,
     maxHeight: '100%',
+  },
+  /*category buttons*/
+  btnContainer:{
+    paddingTop: 10, 
+    justifyContent:'right', 
+    flex:1, 
+    flexDirection: 'row'
+  },
+  btn: {
+    width: 100,
+    height: 40,
+    borderRadius: 10,
+    borderWidth: 3, 
+    borderColor: '#7001b1', 
+    backgroundColor: 'rgba(0,255,96,1)',
+    margin: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    color: '#7001b1',
+    fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 2,
   },
   /*line that separates the bottom player from the upper components */
   footerLine:{

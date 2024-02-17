@@ -65,7 +65,8 @@ const styles = StyleSheet.create({
   },
   title:{
     fontFamily: "Arial",
-    fontSize: 75
+    fontSize: 75,
+    color: '#7001b1',
   },
   /*logout button */
   btn: {
