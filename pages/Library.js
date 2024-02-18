@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Animated, SafeAreaView, Text, StyleSheet, View } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import { Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView } from "react-native-gesture-handler";
 import { SideBar } from "../components/SideBar";
 
 const LibraryScreen= ({navigation}) => {
+  const [selected, setSelected] = useState(null);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -18,10 +18,27 @@ const LibraryScreen= ({navigation}) => {
           locations={[0.02, 0.27, 0.84,0.96,0.99]}
           style={styles.linearGradient}>
         <ScrollView>
-        <View style={{paddingTop: 200, alignItems:'center', justifyContent:'center', flex:1}}>
-          <View>
-            <Text>Library Screen</Text>
-          </View>
+          {/* TEMPORARY TITLE TEXT*/}
+          <Text style={styles.title}> Library Screen</Text>
+          <View style={{paddingTop: 10, alignItems: 'center', justifyContent:'space-evenly', flex:1}}>
+          <View 
+              style={styles.btnContainer}>
+                <Pressable 
+                  style={selected === 'Albums' ? styles.selectedBtn : styles.defaultBtn} 
+                  onPress={() => setSelected('Albums')}>
+                      <Text style={selected === 'Albums' ? styles.selectedText : styles.defaultText}>Albums</Text>
+                </Pressable>
+                <Pressable 
+                  style={selected === 'Artists' ? styles.selectedBtn : styles.defaultBtn} 
+                  onPress={() => setSelected('Artists')}>
+                      <Text style={selected === 'Artists' ? styles.selectedText : styles.defaultText}>Artists</Text>
+                </Pressable>
+                <Pressable 
+                  style={selected === 'Songs' ? styles.selectedBtn : styles.defaultBtn} 
+                  onPress={() => setSelected('Songs')}>
+                      <Text style={selected === 'Songs' ? styles.selectedText : styles.defaultText}>Songs</Text>
+                </Pressable>
+            </View>
         </View>
       </ScrollView>
       </LinearGradient>
@@ -39,6 +56,18 @@ const LibraryScreen= ({navigation}) => {
       flexDirection: 'column',
       backgroundColor: 'blue',
     },
+    title:{
+      maxWidth: 270,
+      marginLeft: 25,
+      marginTop: 65,
+      fontFamily: "Segoe UI",
+      fontSize: 25,
+      fontWeight: '700',
+      letterSpacing: 1,
+      color: '#7001b1',
+      backgroundColor: 'rgba(0,240,215,.25)',
+      borderRadius: 13,
+    },
     /*view that will hold side menu and main content*/
     subContainer:{
       display: 'flex',
@@ -51,6 +80,47 @@ const LibraryScreen= ({navigation}) => {
       opacity: 0.85,
       maxHeight: '100%',
     },
+    /*category buttons*/
+  btnContainer:{
+    paddingTop: 20, 
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  defaultBtn: {
+    width: 100,
+    height: 40,
+    borderRadius: 10,
+    borderWidth: 3, 
+    borderColor: '#7001b1', 
+    backgroundColor: 'rgba(0,255,96,1)',
+    margin: 15,
+    marginHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectedBtn: {
+    width: 100,
+    height: 40,
+    borderRadius: 10,
+    borderWidth: 3,
+    borderColor: 'rgba(0,255,96,1)',
+    backgroundColor: '#7001b1',
+    margin: 15,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  defaultText: {
+    color: '#7001b1',
+    fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 2,
+  },
+  selectedText: {
+    color: 'rgba(0,255,96,1)',
+    fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 2,
+  },
     /*line that separates the bottom player from the upper components */
     footerLine:{
       borderBottomColor: "#7001b1",
