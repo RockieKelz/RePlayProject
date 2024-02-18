@@ -23,10 +23,11 @@ const Home = ({navigation}) => {
             flexibleIndicator={false}
             scrollIndicatorStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.6)' }}
             >
-            {/*Temporary view that will display Home Screen's content*/}            
-            <View style={{paddingTop: 200, alignItems:'center', 
+            {/*Temporary view that will display Home Screen's content*/}   
+            <Text style={styles.title}>Home Screen</Text>
+         
+            <View style={{paddingTop: 10, alignItems:'center', 
                               justifyContent:'center', flex:1}}>
-                <Text style={styles.title}>This is The Home Screen Page</Text>
                 {/*Temporary logout button to test authorization code*/}
                 <Pressable 
                   style={styles.btn} 
@@ -59,14 +60,22 @@ const styles = StyleSheet.create({
   },
   /*holder for the colored background*/
   linearGradient:{
-    flex: 1,
+    flex: 2,
     opacity: 0.85,
     maxHeight: '100%',
   },
   title:{
-    fontFamily: "Arial",
-    fontSize: 75,
+    maxWidth: 280,
+    marginLeft: 25,
+    marginTop: 65,
+    fontFamily: "Segoe UI",
+    fontSize: 25,
+    fontWeight: '700',
+    letterSpacing: 1,
     color: '#7001b1',
+    backgroundColor: 'rgba(0,240,215,.25)',
+    borderRadius: 13,
+    alignSelf: 'center'
   },
   /*logout button */
   btn: {

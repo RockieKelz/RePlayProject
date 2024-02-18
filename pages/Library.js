@@ -3,9 +3,11 @@ import { Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from 'reac
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView } from "react-native-gesture-handler";
 import { SideBar } from "../components/SideBar";
+import { useWindowDimensions } from 'react-native';
 
 const LibraryScreen= ({navigation}) => {
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState('Albums'); // initialize 'Albums' as defaulted selected button
+  const { width } = useWindowDimensions();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -20,11 +22,12 @@ const LibraryScreen= ({navigation}) => {
         <ScrollView>
           {/* TEMPORARY TITLE TEXT*/}
           <Text style={styles.title}> Library Screen</Text>
-          <View style={{paddingTop: 10, alignItems: 'center', justifyContent:'space-evenly', flex:1}}>
+          <View style={{paddingTop: 10}}>
           <View 
-              style={styles.btnContainer}>
+              style={[styles.btnContainer, {justifyContent: width <= 600 ? 'flex-start' : 'space-around'}
+              ]}>
                 <Pressable 
-                  style={selected === 'Albums' ? styles.selectedBtn : styles.defaultBtn} 
+                  style={[selected === 'Albums' ? styles.selectedBtn : styles.defaultBtn]} 
                   onPress={() => setSelected('Albums')}>
                       <Text style={selected === 'Albums' ? styles.selectedText : styles.defaultText}>Albums</Text>
                 </Pressable>
@@ -76,7 +79,7 @@ const LibraryScreen= ({navigation}) => {
     },
     /*holder for the colored background*/
     linearGradient:{
-      flex: 1,
+      flex: 2,
       opacity: 0.85,
       maxHeight: '100%',
     },
@@ -84,30 +87,29 @@ const LibraryScreen= ({navigation}) => {
   btnContainer:{
     paddingTop: 20, 
     flexDirection: 'row',
-    justifyContent: 'space-between',
   },
   defaultBtn: {
-    width: 100,
+    width: 95,
     height: 40,
     borderRadius: 10,
     borderWidth: 3, 
     borderColor: '#7001b1', 
     backgroundColor: 'rgba(0,255,96,1)',
-    margin: 15,
-    marginHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    margin: 1,
   },
   selectedBtn: {
-    width: 100,
+    width: 95,
     height: 40,
     borderRadius: 10,
     borderWidth: 3,
     borderColor: 'rgba(0,255,96,1)',
     backgroundColor: '#7001b1',
-    margin: 15,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    margin: 1,
+
   },
   defaultText: {
     color: '#7001b1',

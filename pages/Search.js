@@ -19,6 +19,7 @@ const Search= ({navigation}) =>  {
           locations={[0.02, 0.27, 0.84,0.96,0.99]}
           style={styles.linearGradient}>
         <ScrollView>
+          {/* TEMPORARY TITLE TEXT*/}          
           <Text style={styles.title}> Search Default Page</Text>
           <View style={{flexDirection:'row', justifyContent: 'space-between'}}>
             <View style={styles.searchContainer}> 
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
   },
   /*holder for the colored background*/
   linearGradient:{
-    flex: 1,
+    flex: 2,
     opacity: 0.85,
     maxHeight: '100%',
   },
