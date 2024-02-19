@@ -2,13 +2,16 @@ import React, {useState, useEffect} from "react";
 import { FlatList, Image, Pressable, SafeAreaView,Text, StyleSheet, View } from 'react-native';
 import { ScrollView } from "react-native-gesture-handler";
 import TextTicker from 'react-native-text-ticker';
-import { fetchPlaylists, fetchProfile, fetchRecentlyPlayed, getRecentlyPlayed, logOut } from "../utils/spotify";
+import { fetchFeaturedPlaylists, fetchNewReleases, fetchProfile, fetchRecentlyPlayed, fetchUsersPlaylists, logOut } from "../utils/spotify";
 import { SideBar } from "../components/SideBar";
 import { LinearGradient } from 'expo-linear-gradient'
 
 const Home =  ({navigation}) => {
   const [recentPlays, setRecentPlays] = useState(null);
   const [user, setUser] = useState(null);
+  const [newlyReleased, setNewReleases] = useState(null);
+  const [featuredPlaylists, setFeaturedPlaylists] = useState(null);
+  const [userPlaylists, setUsersPlaylists] = useState(null);
 
 //Get the users profile and recent data from spotify
  useEffect(() => {
@@ -22,6 +25,16 @@ const Home =  ({navigation}) => {
 
       var recentData = await fetchRecentlyPlayed();
       setRecentPlays({...{recentlyPlayed: recentData}});
+
+      var usersPlaylistsData = await fetchUsersPlaylists();
+      setUsersPlaylists({...{playlists:usersPlaylistsData.playlists.items}});
+
+      var featuredPlaylistData = await fetchFeaturedPlaylists();
+      setFeaturedPlaylists({...{playlists: featuredPlaylistData.playlists.items}});
+
+      var newReleasesData = await fetchNewReleases();
+      setNewReleases({...{newReleases: newReleasesData.albums.items}});
+
     } catch (error) {
       console.log(error);
     }
@@ -29,8 +42,8 @@ const Home =  ({navigation}) => {
     getUserData();
  }, []);
 
-/* Temporary: shows the Recently Played response on console to help get the needed keywords from api response 
-This use effect will be deleted once the Recently Played section is completed */
+/* Temporary: shows the retrieved data response on console to help get the needed keywords from api response 
+This use effect will be deleted once the data section is completed */
  useEffect(() => {
   if (user) {
     console.log('User: ', user)
@@ -38,7 +51,12 @@ This use effect will be deleted once the Recently Played section is completed */
   if (recentPlays) {
     console.log('Recently Played:', recentPlays.recentlyPlayed);
   }
-}, [recentPlays, user]);
+  if(newlyReleased){
+    console.log('Users Playlist: ', userPlaylists, 
+    '\n Featured Playlists: ', featuredPlaylists.playlists,
+    '\n New Realeases: ', newlyReleased.newReleases)
+  }
+}, [recentPlays, user, userPlaylists, featuredPlaylists, newlyReleased]);
 
   /* create a song card that will display song's data */
   const SongCard = ({ item }) => (
