@@ -128,7 +128,7 @@ export async function fetchUsersPlaylists() {
       }
   });
   console.log(response);
-  return response.data;
+  return response.json();
 }
 
 export async function fetchRecentlyPlayed() {
@@ -152,6 +152,18 @@ export async function fetchUsersTopItems(type) {
   console.log(response);
   return await response.json();
 }
+
+//can use user's top songs/artists to get recommendations 
+export async function fetchRecommedations(top_artists, top_genres, top_tracks) {
+  const response = await fetch(`${SPOTIFY_API_URL}/recommendations?limit=5&seed_artists=${top_artists}&seed_genres=${top_genres}&seed_tracks=${top_tracks}`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${savedToken}`
+        }
+  });
+  console.log(response);
+  return await response.json();
+}
 /*=======================================================
 =            Fetch Spotify Data Logic              =
 =======================================================*/
@@ -165,6 +177,7 @@ export async function fetchPlaylist(playlist_id) {
   console.log(response);
   return await response.json();
 }
+
 export async function fetchFeaturedPlaylists() {
   const response = await fetch(`${SPOTIFY_API_URL}/browse/featured-playlists?limit=10`, {
     method: "GET", 
@@ -175,6 +188,18 @@ export async function fetchFeaturedPlaylists() {
   console.log(response);
   return await response.json();
 }
+
+export async function fetchNewReleases() {
+  const response = await fetch(`${SPOTIFY_API_URL}/browse/new-releases?limit=10`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${savedToken}`
+        }
+  });
+  console.log(response);
+  return await response.json();
+}
+
 export async function fetchCategories() {
   const response = await fetch(`${SPOTIFY_API_URL}/browse/categories?limit=20`, {
     method: "GET", 
@@ -185,8 +210,20 @@ export async function fetchCategories() {
   console.log(response);
   return await response.json();
 }
+
 export async function fetchCategorysPlaylists(category_id) {
   const response = await fetch(`${SPOTIFY_API_URL}/browse/categories/${category_id}/playlists`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${savedToken}`
+        }
+  });
+  console.log(response);
+  return await response.json();
+}
+
+export async function fetchSearchResults(search_input) {
+  const response = await fetch(`${SPOTIFY_API_URL}/search?q=${search_input}&type=artist,track,album`, {
     method: "GET", 
     headers: {
           Authorization: `Bearer ${savedToken}`
