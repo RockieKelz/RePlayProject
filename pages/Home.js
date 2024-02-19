@@ -4,6 +4,7 @@ import { logOut } from "../utils/spotify";
 import { SideBar } from "../components/SideBar";
 import { LinearGradient } from 'expo-linear-gradient'
 import ScrollViewIndicator from 'react-native-scroll-indicator';
+import { Footer } from "../components/Footer";
 
 const Home = ({navigation}) => {
   {/* Disable the page's automatic header */}
@@ -39,7 +40,8 @@ const Home = ({navigation}) => {
         </LinearGradient>
       </View>
       <View style={styles.footerLine} />
-    {/*Footer area to display music player*/}            
+    {/*Footer area to display music player*/}      
+    <Footer />      
     </SafeAreaView>
   )
 }
