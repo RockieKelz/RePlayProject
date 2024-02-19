@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView } from "react-native-gesture-handler";
 import { SideBar } from "../components/SideBar";
 import { FontAwesome } from 'react-native-vector-icons';
+import { Footer } from "../components/Footer";
 
 const Search= ({navigation}) =>  {
   const [searchQuery, setSearchQuery] = useState("");
@@ -57,7 +58,8 @@ const Search= ({navigation}) =>  {
       </LinearGradient>
     </View>
     <View style={styles.footerLine} />
-    {/*Footer area to display music player*/}            
+    {/*Footer area to display music player*/}      
+    <Footer />           
   </SafeAreaView>
   )
 }

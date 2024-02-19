@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView } from "react-native-gesture-handler";
 import { SideBar } from "../components/SideBar";
 import { useWindowDimensions } from 'react-native';
+import { Footer } from "../components/Footer";
 
 const LibraryScreen= ({navigation}) => {
   const [selected, setSelected] = useState('Albums'); // initialize 'Albums' as defaulted selected button
@@ -47,7 +48,8 @@ const LibraryScreen= ({navigation}) => {
       </LinearGradient>
       </View>
       <View style={styles.footerLine} />
-    {/*Footer area to display music player*/}
+    {/*Footer area to display music player*/}      
+    <Footer /> 
     </SafeAreaView>
   )
 }
