@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useState} from "react";
 import { Text, StyleSheet, View, Pressable } from 'react-native';
 import { MdHomeFilled, MdSearch } from "react-icons/md";
 import { LinearGradient } from 'expo-linear-gradient'
 import { IoLibrary } from "react-icons/io5";
 
 export function SideBar({navigation}) {
+    
     return (
         <LinearGradient 
             colors={["#EEEEEE", 'rgba(15,251,35,1)','#00F260', '#0575E6']}
@@ -92,4 +93,20 @@ const Container = StyleSheet.create ({
         marginLeft: 5,
         marginRight: 10,
     }
-})
+});
+const styles = StyleSheet.create({
+    recentlyPlayedContainer: {
+        paddingHorizontal: 20,
+        marginTop: 20,
+    },
+    recentlyPlayedTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#fff',
+    },
+    recentlyPlayedTrack: {
+        fontSize: 16,
+        color: '#fff',
+        marginTop: 5,
+    },
+});

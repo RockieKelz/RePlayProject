@@ -1,22 +1,27 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios'
 
 /*=======================================================
 =            Authorization Logic            =
 =======================================================*/
 const authEndpoint = "https://accounts.spotify.com/authorize";
-const redirectUri = "http://localhost:19006";
+const redirectUri = "http://localhost:19006/PostLogin";
 const clientId = "fa3defefdad641c9bc8540d03281e562";
 const params = new URLSearchParams(window.location.search);
-const code = params.get("code");
+export const code = params.get("code");
 const scopes = [
-      "user-read-currently-playing",
-      "user-top-read",
-      "user-modify-playback-state",
-      "streaming",
-      "user-read-email",
-      "user-read-private",
-      "user-library-read",
-      "user-library-modify"
+  "user-read-currently-playing",
+  "user-read-recently-played",
+  "user-read-playback-state",
+  "user-top-read",
+  "user-modify-playback-state",
+  "streaming",
+  "user-read-email",
+  "user-read-private",
+  "user-library-read",
+  "user-library-modify",
+  "playlist-read-private",
+  "playlist-read-collaborative"
 ];
 
 //create code verifier
@@ -46,7 +51,6 @@ export const handleLoginAuth =async ()=>{
     const challenge = await generateCodeChallenge(verifier);
 
     AsyncStorage.setItem("verifier", verifier);
-
     const params = new URLSearchParams();
     params.append("client_id", clientId);
     params.append("response_type", "code");
@@ -64,11 +68,11 @@ export const handleLoginAuth =async ()=>{
 
 //get the access token from spotify 
 export async function getAccessToken() {
-  const verifier = AsyncStorage.getItem("verifier");
+  const verifier = await AsyncStorage.getItem("verifier");
 
   const params = new URLSearchParams();
   params.append("client_id", clientId);
-  params.append("grant_type", "authorization_code");
+  params.append("grant_type", 'authorization_code');
   params.append("code", code);
   params.append("redirect_uri", redirectUri);
   params.append("code_verifier", verifier);
@@ -79,16 +83,18 @@ export async function getAccessToken() {
       body: params
   });
 
-  const { access_token } = await result.json();
-  return access_token;
+  const access_token = await result.json();
+  return access_token.access_token;
 }
 
+let savedToken = await AsyncStorage.getItem("access_token");
 //save the access token using async storage
 export const saveAuthToken = async () => {
 
-  const accessToken = await getAccessToken(clientId, code);
+  const accessToken = await getAccessToken();
   try {
     await AsyncStorage.setItem("access_token", accessToken);
+    savedToken = accessToken
   } catch {
     console.log(error);
   }
@@ -99,4 +105,130 @@ export const logOut = () => {
   AsyncStorage.removeItem('access_token')
   AsyncStorage.removeItem('refresh_token')
   window.location.href='/'
+}
+const SPOTIFY_API_URL = "https://api.spotify.com/v1";
+
+/*=======================================================
+=            User Data Logic                     =
+=======================================================*/
+export async function fetchProfile() {
+  const response = await fetch(`${SPOTIFY_API_URL}/me`, {
+      method: "GET", 
+      headers: { Authorization: `Bearer ${savedToken}`,}
+  });
+  console.log(response);
+  return await response.json();
+}
+
+export async function fetchUsersPlaylists() {
+  const response = await fetch(`${SPOTIFY_API_URL}/me/playlists`, {
+    method: "GET", 
+    headers: {
+          'Authorization': `Bearer ${savedToken}`
+      }
+  });
+  console.log(response);
+  return response.json();
+}
+
+export async function fetchRecentlyPlayed() {
+  const response = await fetch(`${SPOTIFY_API_URL}/me/player/recently-played?limit=10`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${savedToken}`
+        }
+  });
+  console.log(response);
+  return await response.json();
+}
+
+export async function fetchUsersTopItems(type) {
+  const response = await fetch(`${SPOTIFY_API_URL}/me/top/{type}?limit=10`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${savedToken}`
+        }
+  });
+  console.log(response);
+  return await response.json();
+}
+
+//can use user's top songs/artists to get recommendations 
+export async function fetchRecommedations(top_artists, top_genres, top_tracks) {
+  const response = await fetch(`${SPOTIFY_API_URL}/recommendations?limit=5&seed_artists=${top_artists}&seed_genres=${top_genres}&seed_tracks=${top_tracks}`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${savedToken}`
+        }
+  });
+  console.log(response);
+  return await response.json();
+}
+/*=======================================================
+=            Fetch Spotify Data Logic              =
+=======================================================*/
+export async function fetchPlaylist(playlist_id) {
+  const response = await fetch(`${SPOTIFY_API_URL}/playlists/${playlist_id}`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${savedToken}`
+        }
+  });
+  console.log(response);
+  return await response.json();
+}
+
+export async function fetchFeaturedPlaylists() {
+  const response = await fetch(`${SPOTIFY_API_URL}/browse/featured-playlists?limit=10`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${savedToken}`
+        }
+  });
+  console.log(response);
+  return await response.json();
+}
+
+export async function fetchNewReleases() {
+  const response = await fetch(`${SPOTIFY_API_URL}/browse/new-releases?limit=10`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${savedToken}`
+        }
+  });
+  console.log(response);
+  return await response.json();
+}
+
+export async function fetchCategories() {
+  const response = await fetch(`${SPOTIFY_API_URL}/browse/categories?limit=20`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${savedToken}`
+        }
+  });
+  console.log(response);
+  return await response.json();
+}
+
+export async function fetchCategorysPlaylists(category_id) {
+  const response = await fetch(`${SPOTIFY_API_URL}/browse/categories/${category_id}/playlists`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${savedToken}`
+        }
+  });
+  console.log(response);
+  return await response.json();
+}
+
+export async function fetchSearchResults(search_input) {
+  const response = await fetch(`${SPOTIFY_API_URL}/search?q=${search_input}&type=artist,track,album`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${savedToken}`
+        }
+  });
+  console.log(response);
+  return await response.json();
 }

@@ -6,26 +6,31 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LibraryScreen from './pages/Library';
+import { code, saveAuthToken } from './utils/spotify';
 
 function App () {
   const Stack = createNativeStackNavigator();
-  //read and set token using state provider
+
+//read and set token using state provider
  const [token, setToken] = useState(null);
 
  useEffect(() => {
-    const fetchToken = async () => {
+  const fetchToken = async () => {
+    if (code){
       try {
+        //gets and saves the access token from spotify
+        await saveAuthToken()
         const storedToken = await AsyncStorage.getItem("access_token");
-        if (storedToken !== null) {
-          setToken(storedToken);
+        setToken(storedToken);
+        } catch (error) {
+          console.log(error);
         }
-      } catch (error) {
-        console.log(error);
       }
     };
+      fetchToken();
+   }, [code]);
+  
 
-    fetchToken();
- }, []);
   return (
       token ?
             <NavigationContainer>

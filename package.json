@@ -33,8 +33,10 @@
     "react-native-safe-area-view": "github:react-native-community/react-native-safe-area-view",
     "react-native-screens": "~3.22.0",
     "react-native-scroll-indicator": "^0.1.0",
+    "react-native-text-ticker": "^1.14.0",
     "react-native-vector-icons": "^10.0.2",
     "react-native-web": "~0.19.6",
+    "react-redux": "^9.0.4",
     "spotify-web-api-node": "^5.0.2",
     "styled-components": "^6.1.2"
   },
