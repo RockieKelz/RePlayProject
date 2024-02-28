@@ -1,11 +1,31 @@
-import React, {useState} from "react";
-import { Text, StyleSheet, View, Pressable } from 'react-native';
+import React, {useEffect, useState} from "react";
+import { FlatList, Text, StyleSheet, View, Pressable } from 'react-native';
 import { MdHomeFilled, MdSearch } from "react-icons/md";
 import { LinearGradient } from 'expo-linear-gradient'
 import { IoLibrary } from "react-icons/io5";
+import { fetchUsersPlaylists } from "../utils/spotify";
+import ScrollViewIndicator from 'react-native-scroll-indicator';
+
 
 export function SideBar({navigation}) {
-    
+    const [usersPlaylists, setUsersPlaylists] = useState([]);
+    useEffect(() =>  {
+        const getUserPlaylistData = async () => {
+            try {
+                var usersPlaylistsData = await fetchUsersPlaylists();
+                setUsersPlaylists({...{playlists:usersPlaylistsData.items}});
+          
+            } catch (err) {
+                console.log(err);
+            }
+        };
+        getUserPlaylistData();
+    }, []);
+    useEffect(() => {
+        if (usersPlaylists) {
+          console.log(usersPlaylists.playlists);
+        }
+      }, [usersPlaylists]);
     return (
         <LinearGradient 
             colors={["#EEEEEE", 'rgba(15,251,35,1)','#00F260', '#0575E6']}
@@ -13,6 +33,11 @@ export function SideBar({navigation}) {
             end={[1, .75]}
             style={Container.linearGradient}
         >
+            <ScrollViewIndicator
+            shouldIndicatorHide={false}
+            flexibleIndicator={false}
+            scrollIndicatorStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.6)' }}
+            >
             <View style ={Container.menuList}>
                 <Pressable style = {Container.rowItems}
                 onPress={() => navigation.navigate('Home')}>
@@ -38,11 +63,22 @@ export function SideBar({navigation}) {
                         Library
                     </Text>
                 </Pressable>
-                <Text style={Container.playlistText}>
+                <Text style={Container.playlistTitleText}>
                     Playlists
                 </Text>
                 <View style={Container.line}/>
+                {usersPlaylists && usersPlaylists.playlists ? (
+                    <FlatList
+                    data={usersPlaylists.playlists}
+                    renderItem={({ item }) => 
+                    <Pressable 
+                    onPress={{}}>
+                    <Text style={Container.playlistsText}>{item.name}</Text>    
+                    </Pressable> }      
+                    />
+                    ) : (<></>)}
             </View>
+            </ScrollViewIndicator>
         </LinearGradient>
         )
 }
@@ -78,7 +114,7 @@ const Container = StyleSheet.create ({
         color: '#7001b1',
         letterSpacing: 1,
     },
-    playlistText:{
+    playlistTitleText:{
         fontWeight: "bold",
         color: '#7001b1',
         letterSpacing: 2,
@@ -92,21 +128,14 @@ const Container = StyleSheet.create ({
         borderRadius: 6,
         marginLeft: 5,
         marginRight: 10,
+    },
+    playlistsText:{
+        fontWeight: '400',
+        fontFamily: 'Roboto',
+        fontSize: 12,
+        color: '#7001b1',
+        letterSpacing: 2,
+        paddingTop:25,
+        paddingLeft:5,
     }
-});
-const styles = StyleSheet.create({
-    recentlyPlayedContainer: {
-        paddingHorizontal: 20,
-        marginTop: 20,
-    },
-    recentlyPlayedTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#fff',
-    },
-    recentlyPlayedTrack: {
-        fontSize: 16,
-        color: '#fff',
-        marginTop: 5,
-    },
 });

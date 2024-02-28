@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { FlatList, Image, Pressable, SafeAreaView,Text, StyleSheet, View } from 'react-native';
+import { FlatList, Image, Pressable, SafeAreaView,Text, ScrollView, StyleSheet, View } from 'react-native';
 import TextTicker from 'react-native-text-ticker';
 import { fetchFeaturedPlaylists, fetchNewReleases, fetchProfile, fetchRecentlyPlayed, fetchUsersPlaylists, logOut } from "../utils/spotify";
 import { SideBar } from "../components/SideBar";
@@ -27,9 +27,6 @@ const Home =  ({navigation}) => {
 
       var recentData = await fetchRecentlyPlayed();
       setRecentPlays({...{recentlyPlayed: recentData}});
-
-      var usersPlaylistsData = await fetchUsersPlaylists();
-      setUsersPlaylists({...{playlists:usersPlaylistsData.playlists.items}});
 
       var featuredPlaylistData = await fetchFeaturedPlaylists();
       setFeaturedPlaylists({...{playlists: featuredPlaylistData.playlists.items}});
