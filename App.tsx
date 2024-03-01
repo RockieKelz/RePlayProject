@@ -10,7 +10,6 @@ import { reducerCaseActions } from './utils/constants';
 import { useStateProvider } from './utils/stateprovider';
 import { code, saveAuthToken } from './utils/spotify';
 import { initialState } from './utils/reducer';
-import { code, saveAuthToken } from './utils/spotify';
 
 function App () {
   const Stack = createNativeStackNavigator();
@@ -30,6 +29,7 @@ function App () {
               if (token !== null) { 
                 //dispatch the action to set the token and update state
                 dispatch({ type: reducerCaseActions.SET_TOKEN, token });
+              }
             } catch (error) {
               console.log(error);
             }

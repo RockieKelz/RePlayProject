@@ -1,41 +1,51 @@
 import React, {useState, useEffect} from "react";
 import { FlatList, Image, Pressable, SafeAreaView,Text, ScrollView, StyleSheet, View } from 'react-native';
 import TextTicker from 'react-native-text-ticker';
-import { fetchFeaturedPlaylists, fetchNewReleases, fetchProfile, fetchRecentlyPlayed, fetchUsersPlaylists, logOut } from "../utils/spotify";
+import { fetchFeaturedPlaylists, fetchNewReleases, fetchProfile, fetchRecentlyPlayed, logOut } from "../utils/spotify";
 import { SideBar } from "../components/SideBar";
 import { LinearGradient } from 'expo-linear-gradient'
 import ScrollViewIndicator from 'react-native-scroll-indicator';
 import { Footer } from "../components/Footer";
+import { useStateProvider } from "../utils/stateprovider";
+import { reducerCaseActions } from "../utils/constants";
+
 
 const Home =  ({navigation}) => {
-  const [recentPlays, setRecentPlays] = useState(null);
-  const [user, setUser] = useState(null);
-  const [newlyReleased, setNewReleases] = useState(null);
-  const [featuredPlaylists, setFeaturedPlaylists] = useState(null);
-  const [userPlaylists, setUsersPlaylists] = useState(null);
-
+  const [{ token, featuredPlaylists, newReleases, recentlyplayed, user }, dispatch] = useStateProvider();
 
 //Get the users profile and recent data from spotify
  useEffect(() => {
   const getUserData = async () => {
-    try {
-      var profileData = await fetchProfile();
-      setUser({...user, 
-        displayName: profileData.display_name, 
-        userID:profileData.id, 
-        profileImage: profileData.images});
+    if (token){
+      try {
+        var profileData = await fetchProfile(token);
+        dispatch({ 
+          type: reducerCaseActions.SET_USER, 
+            displayName: profileData.display_name,
+            userID:profileData.id, 
+            profileImage: profileData.images,
+        });
 
-      var recentData = await fetchRecentlyPlayed();
-      setRecentPlays({...{recentlyPlayed: recentData}});
+        var recentData = await fetchRecentlyPlayed(token);
+        dispatch({ 
+          type: reducerCaseActions.SET_RECENTLYPLAYED, 
+          recentlyplayed: recentData,
+        });
 
-      var featuredPlaylistData = await fetchFeaturedPlaylists();
-      setFeaturedPlaylists({...{playlists: featuredPlaylistData.playlists.items}});
+        var featuredPlaylistData = await fetchFeaturedPlaylists(token);
+        dispatch({ 
+          type: reducerCaseActions.SET_FEATURED, 
+          featuredPlaylists: featuredPlaylistData,
+        });
+        var newReleasesData = await fetchNewReleases(token);
+        dispatch({ 
+          type: reducerCaseActions.SET_NEWRELEASE, 
+          newReleases: newReleasesData,
+        });
 
-      var newReleasesData = await fetchNewReleases();
-      setNewReleases({...{newReleases: newReleasesData.albums.items}});
-
-    } catch (error) {
-      console.log(error);
+      } catch (error) {
+        console.log(error);
+      }
     }
  };
     getUserData();
@@ -47,15 +57,16 @@ This use effect will be deleted once the data section is completed */
   if (user) {
     console.log('User: ', user)
   }
-  if (recentPlays) {
-    console.log('Recently Played:', recentPlays.recentlyPlayed);
+  if (recentlyplayed) {
+    console.log('Recently Played:', recentlyplayed.items);
   }
-  if(newlyReleased){
-    console.log('Users Playlist: ', userPlaylists, 
-    '\n Featured Playlists: ', featuredPlaylists.playlists,
-    '\n New Realeases: ', newlyReleased.newReleases)
+  if (featuredPlaylists) {
+    console.log('Featured Playlists: ', featuredPlaylists.playlists.items);
   }
-}, [recentPlays, user, userPlaylists, featuredPlaylists, newlyReleased]);
+  if (newReleases) {
+    console.log('New Releases: ', newReleases.albums.items)
+  }
+}, [recentlyplayed, user, featuredPlaylists, newReleases]);
 
   /* create a song card that will display song's data */
   const SongCard = ({ item }) => (
@@ -154,7 +165,7 @@ This use effect will be deleted once the data section is completed */
                   </>)}
                 </Text>
                 {/*display recently played songs if there are any*/}
-                {recentPlays && recentPlays.recentlyPlayed.items ? (
+                {recentlyplayed && recentlyplayed.items ? (
                   <>
                 <Text style={styles.title}>
                    Recently Played Songs
@@ -164,7 +175,7 @@ This use effect will be deleted once the data section is completed */
                   <>
                     <View style={styles.cardContainer}>
                       <FlatList
-                        data={recentPlays.recentlyPlayed.items}
+                        data={recentlyplayed.items}
                         renderItem={({ item }) => 
                         <SongCard item={item} />}
                         numColumns={5}

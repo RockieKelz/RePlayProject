@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios'
 
 /*=======================================================
 =            Authorization Logic            =
@@ -93,9 +92,11 @@ export const saveAuthToken = async () => {
     const accessToken = await getAccessToken();
     try {
       await AsyncStorage.setItem("access_token", accessToken);
-    } catch (error) {
+      savedToken = accessToken
+
+    } catch {
       console.log(error);
-    }
+    }  
 }
 
 export const logOut = () => {
@@ -110,10 +111,10 @@ const SPOTIFY_API_URL = "https://api.spotify.com/v1";
 /*=======================================================
 =            User Data Logic                     =
 =======================================================*/
-export async function fetchProfile() {
+export async function fetchProfile(token) {
   const response = await fetch(`${SPOTIFY_API_URL}/me`, {
       method: "GET", 
-      headers: { Authorization: `Bearer ${savedToken}`,}
+      headers: { Authorization: `Bearer ${token}`,}
   });
   console.log(response);
   return await response.json();
@@ -130,11 +131,11 @@ export async function fetchUsersPlaylists() {
   return response.json();
 }
 
-export async function fetchRecentlyPlayed() {
+export async function fetchRecentlyPlayed(token) {
   const response = await fetch(`${SPOTIFY_API_URL}/me/player/recently-played?limit=10`, {
     method: "GET", 
     headers: {
-          Authorization: `Bearer ${savedToken}`
+          Authorization: `Bearer ${token}`
         }
   });
   console.log(response);
@@ -177,22 +178,22 @@ export async function fetchPlaylist(playlist_id) {
   return await response.json();
 }
 
-export async function fetchFeaturedPlaylists() {
+export async function fetchFeaturedPlaylists(token) {
   const response = await fetch(`${SPOTIFY_API_URL}/browse/featured-playlists?limit=10`, {
     method: "GET", 
     headers: {
-          Authorization: `Bearer ${savedToken}`
+          Authorization: `Bearer ${token}`
         }
   });
   console.log(response);
   return await response.json();
 }
 
-export async function fetchNewReleases() {
+export async function fetchNewReleases(token) {
   const response = await fetch(`${SPOTIFY_API_URL}/browse/new-releases?limit=10`, {
     method: "GET", 
     headers: {
-          Authorization: `Bearer ${savedToken}`
+          Authorization: `Bearer ${token}`
         }
   });
   console.log(response);

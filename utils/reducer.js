@@ -3,12 +3,20 @@ import { reducerCaseActions } from "./constants";
 //Set up the initial state for app data
 export const initialState = {
   token: null,
-  userInfo: null,
-  playlists: [],
   currentPlaying: null,
+  featuredPlaylists: null,
+  newReleases: null,
+  playlists: [],
   playerState: false,
+  recentlyplayed: null,
   selectedPlaylist: null,
   selectedPlaylistId: "37i9dQZF1E37jO8SiMT0yN",
+  user: {
+    displayName: null,
+    userID:null,
+    profileImage: null,
+  },
+
 };
 
 //Change the app's state using the current state and reducer's case actions
@@ -21,13 +29,25 @@ const reducer = (state, action) => {
       };
     case reducerCaseActions.SET_USER:
       return {
-        ...state,
-        userInfo: action.userInfo,
+        ...state, user: {
+        displayName: action.displayName,
+        userID: action.userID,
+        profileImage: action.profileImage,}
       };
       case reducerCaseActions.SET_ALBUMS:
       return {
         ...state,
         albums: action.albums,
+      };
+      case reducerCaseActions.SET_FEATURED:
+      return {
+        ...state,
+        featuredPlaylists: action.featuredPlaylists,
+      };
+      case reducerCaseActions.SET_NEWRELEASE:
+      return {
+        ...state,
+        newReleases: action.newReleases,
       };
       case reducerCaseActions.SET_PLAYER_STATE:
         return {
