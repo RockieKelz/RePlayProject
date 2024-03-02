@@ -82,6 +82,8 @@ const reducer = (state, action) => {
         tracks: action.tracks,
         albums: action.albums,
       };
+    case reducerCaseActions.LOGOUT:
+      return { ...initialState }
     default:
       return state;
   }

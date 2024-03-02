@@ -1,7 +1,6 @@
 import React from "react";
 import { Pressable, Text, StyleSheet, View} from 'react-native';
-import { handleLoginAuth, saveAuthToken }  from "../utils/spotify";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { handleLoginAuth }  from "../utils/spotify";
 
 const Login= () =>  {
   const handleLogin = async () => {

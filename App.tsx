@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Search from './pages/Search';
@@ -9,7 +9,6 @@ import LibraryScreen from './pages/Library';
 import { reducerCaseActions } from './utils/constants';
 import { useStateProvider } from './utils/stateprovider';
 import { code, saveAuthToken } from './utils/spotify';
-import { initialState } from './utils/reducer';
 
 function App () {
   const Stack = createNativeStackNavigator();

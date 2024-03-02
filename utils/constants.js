@@ -17,4 +17,5 @@ export const reducerCaseActions ={
     SET_TOKEN : "SET_TOKEN",
     SET_TRACKS : 'SET_TRACKS',
     SET_USER : "SET_USER",
+    LOGOUT : "LOGOUT",
 };

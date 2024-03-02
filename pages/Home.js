@@ -54,19 +54,22 @@ const Home =  ({navigation}) => {
 /* Temporary: shows the retrieved data response on console to help get the needed keywords from api response 
 This use effect will be deleted once the data section is completed */
  useEffect(() => {
+  if (token) {
+    console.log('token: ', token)
+  }
   if (user) {
     console.log('User: ', user)
   }
   if (recentlyplayed) {
     console.log('Recently Played:', recentlyplayed.items);
   }
-  if (featuredPlaylists) {
-    console.log('Featured Playlists: ', featuredPlaylists.playlists.items);
+  if (featuredPlaylists != null) {
+    console.log('Featured Playlists: ', featuredPlaylists);
   }
-  if (newReleases) {
-    console.log('New Releases: ', newReleases.albums.items)
+  if (newReleases != null) {
+    console.log('New Releases: ', newReleases)
   }
-}, [recentlyplayed, user, featuredPlaylists, newReleases]);
+}, [recentlyplayed, user, featuredPlaylists, newReleases, token]);
 
   /* create a song card that will display song's data */
   const SongCard = ({ item }) => (
@@ -140,6 +143,11 @@ This use effect will be deleted once the data section is completed */
     </View>
   );
 
+  const logOutReset = () => {
+    dispatch(reducerCaseActions.LOGOUT);
+    logOut();
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style= {styles.subContainer}>
@@ -191,7 +199,7 @@ This use effect will be deleted once the data section is completed */
                 {/*Temporary logout button to test authorization code*/}
                 <Pressable 
                   style={styles.btn} 
-                  onPress={logOut}>
+                  onPress={logOutReset}>
                 <Text style={styles.logoutText}>Log Out</Text>
                 </Pressable>
           
