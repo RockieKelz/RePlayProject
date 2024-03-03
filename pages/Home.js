@@ -72,32 +72,36 @@ This use effect will be deleted once the data section is completed */
 }, [recentlyplayed, user, featuredPlaylists, newReleases, token]);
 
   /* create a song card that will display song's data */
-  const SongCard = ({ item }) => (
+  const SongCard = ({ album, artist, playlist, trackName }) => (
     <View style={styles.card}>
       {/* song's information:
        SONG NAME as card's header*/}
-      <View style={{ width: 145, height: 30 }}>
-        <TextTicker /* Looping scroll for track name */
-          style={styles.primaryName}
-          duration={7500}
-          animationType={'auto'}
-          marqueeDelay={1250}
-          repeatSpacer={65}
-        >
-          {item.track.name}
-        </TextTicker>
-      </View>
+       {trackName && (
+        <View style={{ width: 145, height: 30 }}>
+          <TextTicker /* Looping scroll for track name */
+            style={styles.primaryName}
+            duration={7500}
+            animationType={'auto'}
+            marqueeDelay={1250}
+            repeatSpacer={65}
+          >
+            {trackName}
+          </TextTicker>
+        </View>
+      )}
       {/* =========================================================
             TO DO: DISPLAY DEFAULT IMAGE FOR WHEN THERE IS NO ALBUM IMAGES
             =============================================================*/}
-      {item.track.album.images[0] && (
+      {album.image && (
         <Image
-          source={{ uri: item.track.album.images[0].url }}
+          source={{ uri: album.image.url }}
           style={styles.albumImage}
         />
       )}
       {/* Album and Artist info as subheaders*/}
+      {artist && artist[0].name ? (
       <View style={{ width: 145, flexDirection: 'row' }}>
+        <>
         <Text style={styles.labelName}>Artist: </Text>
         <View style={{ width: 105 }}>
           <TextTicker /* bouncing horizontal scroll for artist(s) */
@@ -108,10 +112,10 @@ This use effect will be deleted once the data section is completed */
             repeatSpacer={65}
           >
             {/*Check if there's multiple artists and separate their names*/}
-            {item.track.artists.length > 1 ? (
-              item.track.artists.map((artist, index) => (
+            {artist.length > 1 ? (
+              artist.map((artist, index) => (
                 <Text key={index}>
-                  {artist.name} {index == item.track.artists.length - 1 ? (
+                  {artist.name} {index == artist.length - 1 ? (
                     <Text> {" "} </Text>
                   ) : (
                     <Text>, </Text>
@@ -120,12 +124,14 @@ This use effect will be deleted once the data section is completed */
               ))
             ) : (
               <Text>
-                {item.track.artists[0].name}
+                {artist[0].name}
               </Text>
             )}
           </TextTicker>
         </View>
-      </View>
+        </>
+      </View>) : (<></>)}
+      {album.name && (
       <View style={{ width: 146, flexDirection: 'row' }}>
         <Text style={styles.labelName}>Album: </Text>
         <View style={{ width: 100 }}>
@@ -136,10 +142,24 @@ This use effect will be deleted once the data section is completed */
             marqueeDelay={1250}
             repeatSpacer={65}
           >
-            {item.track.album.name}
+            {album.name}
           </TextTicker>
         </View>
-      </View>
+      </View>)}
+      {playlist && (
+      <View style={{ width: 146, flexDirection: 'row' }}>
+        <Text style={styles.labelName}>Playlist: </Text>
+        <View style={{ width: 98 }}>
+          <TextTicker /* bouncing horizontal scroll for artist(s) */
+            style={styles.subName}
+            duration={7700}
+            animationType={'bounce'}
+            marqueeDelay={1250}
+            repeatSpacer={65}
+          > {playlist.name}
+          </TextTicker>
+        </View>
+      </View>)}
     </View>
   );
 
@@ -185,10 +205,68 @@ This use effect will be deleted once the data section is completed */
                       <FlatList
                         data={recentlyplayed.items}
                         renderItem={({ item }) => 
-                        <SongCard item={item} />}
+                        <SongCard 
+                          trackName={item.track.name}
+                          album={{ name: item.track.album.name, image: item.track.album.images[0] }}
+                          artist={item.track.artists}
+                          />}
                         numColumns={5}
                         showsHorizontalScrollIndicator={false}
                         keyExtractor={(item, index) => index.toString()}
+                      />
+                    </View>
+                  </>
+                </ScrollView>
+                </>
+                  ) : (<></>)}
+                  {/*display new releases if there are any*/}
+                {newReleases && newReleases.albums ? (
+                  <>
+                <Text style={styles.title}>
+                   New Releases
+                </Text>
+                {/* scroll box that will hold 2 rows of new release data cards*/}
+                <ScrollView horizontal> 
+                  <>
+                    <View style={styles.cardContainer}>
+                      <FlatList
+                        data={newReleases.albums.items}
+                        renderItem={({ item }) => 
+                        <SongCard 
+                          trackName={null}
+                          album={{ name: item.name, image: item.images[0] }}
+                          artist={item.artists}
+                          />}
+                      numColumns={5}
+                      showsHorizontalScrollIndicator={false}
+                      keyExtractor={(item, index) => index.toString()}
+                      />
+                    </View>
+                  </>
+                </ScrollView>
+                </>
+                  ) : (<></>)}
+
+                {/*display featured playlists if there are any*/}
+                {featuredPlaylists && featuredPlaylists.playlists ? (
+                <>
+                <Text style={styles.title}>
+                   Featured Playlists
+                </Text>
+                {/* scroll box that will hold 2 rows of playlist data cards*/}
+                <ScrollView horizontal> 
+                  <>
+                    <View style={styles.cardContainer}>
+                      <FlatList
+                        data={featuredPlaylists.playlists.items}
+                        renderItem={({ item }) => 
+                        <SongCard           
+                          album={{ image: item.images[0] }}
+                          playlist={{name: item.name}}
+                          />}
+                      numColumns={5}
+                      showsHorizontalScrollIndicator={false}
+                      keyExtractor={(item, index) => index.toString()}
                       />
                     </View>
                   </>
@@ -284,7 +362,6 @@ const styles = StyleSheet.create({
     padding: 12,
     margin: 10,
     alignItems: 'center', 
-    justifyContent: 'space-between', 
     minWidth: 165,
   },
   labelName: {
