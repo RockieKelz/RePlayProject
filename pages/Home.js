@@ -342,13 +342,15 @@ const styles = StyleSheet.create({
   },
   /*card like views*/
   cardContainer: {
+    marginTop: 14, 
     marginBottom: 16,
     marginStart: 10, 
     flexDirection: 'row', 
     alignItems: 'center', 
     justifyContent: 'space-between', 
     flexWrap: 'wrap',
-    minWidth: 950
+    minWidth: 950,
+    backgroundColor: 'rgba(50, 242, 134, 0.27)',
   },
   card:{
     height: 245,
