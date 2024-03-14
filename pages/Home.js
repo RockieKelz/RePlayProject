@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from "react";
 import { FlatList, Image, Pressable, SafeAreaView,Text, ScrollView, StyleSheet, View } from 'react-native';
-import TextTicker from 'react-native-text-ticker';
 import { fetchFeaturedPlaylists, fetchNewReleases, fetchProfile, fetchRecentlyPlayed, logOut } from "../utils/spotify";
 import { SideBar } from "../components/SideBar";
 import { LinearGradient } from 'expo-linear-gradient'
@@ -8,7 +7,7 @@ import ScrollViewIndicator from 'react-native-scroll-indicator';
 import { Footer } from "../components/Footer";
 import { useStateProvider } from "../utils/stateprovider";
 import { reducerCaseActions } from "../utils/constants";
-
+import { MusicCard } from "../components/MusicCard";
 
 const Home =  ({navigation}) => {
   const [{ token, featuredPlaylists, newReleases, recentlyplayed, user }, dispatch] = useStateProvider();
@@ -72,97 +71,7 @@ This use effect will be deleted once the data section is completed */
 }, [recentlyplayed, user, featuredPlaylists, newReleases, token]);
 
   /* create a song card that will display song's data */
-  const SongCard = ({ album, artist, playlist, trackName }) => (
-    <View style={styles.card}>
-      {/* song's information:
-       SONG NAME as card's header*/}
-       {trackName && (
-        <View style={{ width: 145, height: 30 }}>
-          <TextTicker /* Looping scroll for track name */
-            style={styles.primaryName}
-            duration={7500}
-            animationType={'auto'}
-            marqueeDelay={1250}
-            repeatSpacer={65}
-          >
-            {trackName}
-          </TextTicker>
-        </View>
-      )}
-      {/* =========================================================
-            TO DO: DISPLAY DEFAULT IMAGE FOR WHEN THERE IS NO ALBUM IMAGES
-            =============================================================*/}
-      {album.image && (
-        <Image
-          source={{ uri: album.image.url }}
-          style={styles.albumImage}
-        />
-      )}
-      {/* Album and Artist info as subheaders*/}
-      {artist && artist[0].name ? (
-      <View style={{ width: 145, flexDirection: 'row' }}>
-        <>
-        <Text style={styles.labelName}>Artist: </Text>
-        <View style={{ width: 105 }}>
-          <TextTicker /* bouncing horizontal scroll for artist(s) */
-            style={styles.subName}
-            duration={4500}
-            animationType={'bounce'}
-            marqueeDelay={1250}
-            repeatSpacer={65}
-          >
-            {/*Check if there's multiple artists and separate their names*/}
-            {artist.length > 1 ? (
-              artist.map((artist, index) => (
-                <Text key={index}>
-                  {artist.name} {index == artist.length - 1 ? (
-                    <Text> {" "} </Text>
-                  ) : (
-                    <Text>, </Text>
-                  )}
-                </Text>
-              ))
-            ) : (
-              <Text>
-                {artist[0].name}
-              </Text>
-            )}
-          </TextTicker>
-        </View>
-        </>
-      </View>) : (<></>)}
-      {album.name && (
-      <View style={{ width: 146, flexDirection: 'row' }}>
-        <Text style={styles.labelName}>Album: </Text>
-        <View style={{ width: 100 }}>
-          <TextTicker /* bouncing horizontal scroll for artist(s) */
-            style={styles.subName}
-            duration={7700}
-            animationType={'bounce'}
-            marqueeDelay={1250}
-            repeatSpacer={65}
-          >
-            {album.name}
-          </TextTicker>
-        </View>
-      </View>)}
-      {playlist && (
-      <View style={{ width: 146, flexDirection: 'row' }}>
-        <Text style={styles.labelName}>Playlist: </Text>
-        <View style={{ width: 98 }}>
-          <TextTicker /* bouncing horizontal scroll for artist(s) */
-            style={styles.subName}
-            duration={7700}
-            animationType={'bounce'}
-            marqueeDelay={1250}
-            repeatSpacer={65}
-          > {playlist.name}
-          </TextTicker>
-        </View>
-      </View>)}
-    </View>
-  );
-
+  
   const logOutReset = () => {
     dispatch(reducerCaseActions.LOGOUT);
     logOut();
@@ -205,7 +114,7 @@ This use effect will be deleted once the data section is completed */
                       <FlatList
                         data={recentlyplayed.items}
                         renderItem={({ item }) => 
-                        <SongCard 
+                        <MusicCard 
                           trackName={item.track.name}
                           album={{ name: item.track.album.name, image: item.track.album.images[0] }}
                           artist={item.track.artists}
@@ -232,7 +141,7 @@ This use effect will be deleted once the data section is completed */
                       <FlatList
                         data={newReleases.albums.items}
                         renderItem={({ item }) => 
-                        <SongCard 
+                        <MusicCard 
                           trackName={null}
                           album={{ name: item.name, image: item.images[0] }}
                           artist={item.artists}
@@ -260,7 +169,7 @@ This use effect will be deleted once the data section is completed */
                       <FlatList
                         data={featuredPlaylists.playlists.items}
                         renderItem={({ item }) => 
-                        <SongCard           
+                        <MusicCard           
                           album={{ image: item.images[0] }}
                           playlist={{name: item.name}}
                           />}
