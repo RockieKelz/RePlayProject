@@ -5,10 +5,55 @@ import { ScrollView } from "react-native-gesture-handler";
 import { SideBar } from "../components/SideBar";
 import { FontAwesome } from 'react-native-vector-icons';
 import { Footer } from "../components/Footer";
+import { reducerCaseActions } from "../utils/constants";
+import { useStateProvider } from "../utils/stateprovider";
+import { fetchSearchResults } from "../utils/spotify";
 
 const Search= ({navigation}) =>  {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [{ albums, artists, token, tracks }, dispatch] = useStateProvider();
 
+  const [searchQuery, setSearchQuery] = useState(""); //for searching text from input field
+
+  //set the default search category type and ability to change it.
+  const [selectedCategory, setSelectedCategory] = useState('albums');
+  const setCategory = (category) => {
+    setSelectedCategory(category);
+  };
+
+  //function to handle fetching and dispatching search results
+  async function GetSearchResult(searchQuery){
+    console.log("Searching for " + searchQuery)
+    try {
+      var searchResultsData = await fetchSearchResults(searchQuery, token);
+      dispatch({ 
+        type: reducerCaseActions.SET_SEARCHRESULTS, 
+        albums:searchResultsData.albums,
+        artists: searchResultsData.artists,
+        tracks: searchResultsData.tracks,
+      });
+    } catch (error) {
+      console.log(error);
+    }}
+
+    useEffect(() => {
+      /* search will temporary run as the user types in the search bar
+          plan to change so that click and key events trigger the function*/
+    if (searchQuery && searchQuery.length > 0) {
+      GetSearchResult(searchQuery)
+      }
+      /*TEMPORARY: 
+        shows the retrieved data response on console to help get the needed keywords from api response 
+        This use effect will be deleted once the data section is completed  */
+    if (albums) {
+      console.log('albums: ', albums)
+    }
+    if (artists) {
+      console.log('artists: ', artists)
+    }
+    if (tracks) {
+      console.log('tracks: ', tracks)
+    }
+  } ,[albums, artists, tracks, searchQuery])
   return (
   <SafeAreaView style={styles.container}>
     <View style= {styles.subContainer}>
@@ -20,14 +65,18 @@ const Search= ({navigation}) =>  {
           locations={[0.02, 0.27, 0.84,0.96,0.99]}
           style={styles.linearGradient}>
         <ScrollView>
+
           {/* TEMPORARY TITLE TEXT*/}          
           <Text style={styles.title}> Search Default Page</Text>
+          {/*search bar row*/}
           <View style={{flexDirection:'row', justifyContent: 'space-between'}}>
+            {/*search bar*/}
             <View style={styles.searchContainer}> 
               <FontAwesome 
                 name="search" 
                 size={20} 
                 color="purple" 
+                onClick={{}}
                 style={styles.searchIcon} />
               <TextInput 
                 style={styles.searchInput} 
@@ -35,25 +84,27 @@ const Search= ({navigation}) =>  {
                 value={searchQuery} 
                 onChangeText={(text) => setSearchQuery(text)} /> 
             </View> 
+            {/*buttons to change the selected search catergory type */}
             <View 
               style={{...styles.btnContainer, marginLeft: 'auto'}}>
                 <Pressable 
-                  style={styles.btn} 
-                  onPress={{}}>
-                      <Text style={styles.text}>Albums</Text>
+                  style={[selectedCategory === 'albums' ? styles.selectedBtn : styles.defaultBtn]} 
+                  onPress={() => setCategory('albums')}>
+                      <Text style={selectedCategory === 'albums' ? styles.selectedText : styles.defaultText}>Albums</Text>
                 </Pressable>
                 <Pressable 
-                  style={styles.btn} 
-                  onPress={{}}>
-                      <Text style={styles.text}>Artists</Text>
+                  style={[selectedCategory === 'artists' ? styles.selectedBtn : styles.defaultBtn]} 
+                  onPress={() => setCategory('artists')}>
+                      <Text style={selectedCategory === 'artists' ? styles.selectedText : styles.defaultText}>Albums</Text>
                 </Pressable>
                 <Pressable 
-                  style={styles.btn} 
-                  onPress={{}}>
-                      <Text style={styles.text}>Songs</Text>
+                  style={[selectedCategory === 'tracks' ? styles.selectedBtn : styles.defaultBtn]} 
+                  onPress={() => setCategory('tracks')}>
+                      <Text style={selectedCategory === 'tracks' ? styles.selectedText : styles.defaultText}>Songs</Text>
                 </Pressable>
             </View>
           </View>
+          {/* Area to display results cards*/}
         </ScrollView>
       </LinearGradient>
     </View>
@@ -128,19 +179,37 @@ const styles = StyleSheet.create({
     paddingTop: 20, 
     flexDirection: 'row'
   },
-  btn: {
-    width: 100,
+  defaultBtn: {
+    width: 95,
     height: 40,
     borderRadius: 10,
     borderWidth: 3, 
     borderColor: '#7001b1', 
     backgroundColor: 'rgba(0,255,96,1)',
-    margin: 5,
     alignItems: 'center',
     justifyContent: 'center',
+    margin: 5,
   },
-  text: {
+  selectedBtn: {
+    width: 95,
+    height: 40,
+    borderRadius: 10,
+    borderWidth: 3,
+    borderColor: 'rgba(0,255,96,1)',
+    backgroundColor: '#7001b1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 5,
+
+  },
+  defaultText: {
     color: '#7001b1',
+    fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 2,
+  },
+  selectedText: {
+    color: 'rgba(0,255,96,1)',
     fontSize: 16,
     fontWeight: 'bold',
     letterSpacing: 2,

@@ -3,14 +3,17 @@ import { reducerCaseActions } from "./constants";
 //Set up the initial state for app data
 export const initialState = {
   token: null,
+  albums: null,
+  artists: null,
   currentPlaying: null,
   featuredPlaylists: null,
   newReleases: null,
-  playlists: [],
+  playlists: null,
   playerState: false,
   recentlyplayed: null,
   selectedPlaylist: null,
   selectedPlaylistId: "37i9dQZF1E37jO8SiMT0yN",
+  tracks: null,
   user: {
     displayName: null,
     userID:null,
