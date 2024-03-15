@@ -5,16 +5,21 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { IoLibrary } from "react-icons/io5";
 import { fetchUsersPlaylists } from "../utils/spotify";
 import ScrollViewIndicator from 'react-native-scroll-indicator';
+import { reducerCaseActions } from "../utils/constants";
+import { useStateProvider } from "../utils/stateprovider";
 
 
 export function SideBar({navigation}) {
-    const [usersPlaylists, setUsersPlaylists] = useState([]);
+    const [{ token, usersPlaylists}, dispatch] = useStateProvider();
+
     useEffect(() =>  {
         const getUserPlaylistData = async () => {
             try {
-                var usersPlaylistsData = await fetchUsersPlaylists();
-                setUsersPlaylists({...{playlists:usersPlaylistsData.items}});
-          
+                var usersPlaylistsData = await fetchUsersPlaylists(token);
+                dispatch({ 
+                  type: reducerCaseActions.SET_PLAYLISTS, 
+                  usersPlaylists: usersPlaylistsData.items,
+                });
             } catch (err) {
                 console.log(err);
             }
@@ -23,7 +28,7 @@ export function SideBar({navigation}) {
     }, []);
     useEffect(() => {
         if (usersPlaylists) {
-          console.log(usersPlaylists.playlists);
+          console.log(usersPlaylists);
         }
       }, [usersPlaylists]);
     return (
@@ -67,9 +72,9 @@ export function SideBar({navigation}) {
                     Playlists
                 </Text>
                 <View style={Container.line}/>
-                {usersPlaylists && usersPlaylists.playlists ? (
+                {usersPlaylists ? (
                     <FlatList
-                    data={usersPlaylists.playlists}
+                    data={usersPlaylists}
                     renderItem={({ item }) => 
                     <Pressable 
                     onPress={{}}>
