@@ -120,11 +120,11 @@ export async function fetchProfile(token) {
   return await response.json();
 }
 
-export async function fetchUsersPlaylists() {
+export async function fetchUsersPlaylists(token) {
   const response = await fetch(`${SPOTIFY_API_URL}/me/playlists`, {
     method: "GET", 
     headers: {
-          'Authorization': `Bearer ${savedToken}`
+          'Authorization': `Bearer ${token}`
       }
   });
   console.log(response);
@@ -222,11 +222,11 @@ export async function fetchCategorysPlaylists(category_id) {
   return await response.json();
 }
 
-export async function fetchSearchResults(search_input) {
-  const response = await fetch(`${SPOTIFY_API_URL}/search?q=${search_input}&type=artist,track,album`, {
+export async function fetchSearchResults(search_input, token) {
+  const response = await fetch(`${SPOTIFY_API_URL}/search?q=${search_input}&type=artist,track,album`,{
     method: "GET", 
     headers: {
-          Authorization: `Bearer ${savedToken}`
+          Authorization: `Bearer ${token}`
         }
   });
   console.log(response);
