@@ -21,16 +21,15 @@ export const MusicCard = ({ album, artist, playlist, trackName }) => (
       {/* =========================================================
             TO DO: DISPLAY DEFAULT IMAGE FOR WHEN THERE IS NO ALBUM IMAGES
             =============================================================*/}
-      {album.image && (
+        {album.image && (
         <Image
           source={{ uri: album.image.url }}
           style={styles.albumImage}
         />
       )}
       {/* Album and Artist info as subheaders*/}
-      {artist && artist[0].name ? (
-      <View style={{ width: 145, flexDirection: 'row' }}>
-        <>
+      {artist && artist.name ? (
+        <View style={{ width: 145, flexDirection: 'row' }}>
         <Text style={styles.labelName}>Artist: </Text>
         <View style={{ width: 105 }}>
           <TextTicker /* bouncing horizontal scroll for artist(s) */
@@ -40,26 +39,44 @@ export const MusicCard = ({ album, artist, playlist, trackName }) => (
             marqueeDelay={1250}
             repeatSpacer={65}
           >
-            {/*Check if there's multiple artists and separate their names*/}
-            {artist.length > 1 ? (
-              artist.map((artist, index) => (
-                <Text key={index}>
-                  {artist.name} {index == artist.length - 1 ? (
-                    <Text> {" "} </Text>
-                  ) : (
-                    <Text>, </Text>
-                  )}
+            <Text>{artist.name}</Text>
+            </TextTicker>
+            </View>
+            </View>
+      ) : (<>
+        {artist && artist[0].name? (
+        <View style={{ width: 145, flexDirection: 'row' }}>
+          <>
+          <Text style={styles.labelName}>Artist: </Text>
+          <View style={{ width: 105 }}>
+            <TextTicker /* bouncing horizontal scroll for artist(s) */
+              style={styles.subName}
+              duration={4500}
+              animationType={'bounce'}
+              marqueeDelay={1250}
+              repeatSpacer={65}
+            >
+              {/*Check if there's multiple artists and separate their names*/}
+              {artist.length > 1 ? (
+                artist.map((artist, index) => (
+                  <Text key={index}>
+                    {artist.name} {index == artist.length - 1 ? (
+                      <Text> {" "} </Text>
+                    ) : (
+                      <Text>, </Text>
+                    )}
+                  </Text>
+                ))
+              ) : (
+                <Text>
+                  {artist[0].name}
                 </Text>
-              ))
-            ) : (
-              <Text>
-                {artist[0].name}
-              </Text>
-            )}
-          </TextTicker>
-        </View>
-        </>
-      </View>) : (<></>)}
+              )}
+            </TextTicker>
+          </View>
+          </>
+        </View>) : (<></>)} 
+        </>)}
       {album.name && (
       <View style={{ width: 146, flexDirection: 'row' }}>
         <Text style={styles.labelName}>Album: </Text>
@@ -91,7 +108,6 @@ export const MusicCard = ({ album, artist, playlist, trackName }) => (
       </View>)}
     </View>
   );
-
 
   const styles = StyleSheet.create({
   /*song data views*/
