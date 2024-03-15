@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, Pressable, SafeAreaView,Text, TextInput, ScrollView, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ScrollView } from "react-native-gesture-handler";
 import { SideBar } from "../components/SideBar";
 import { FontAwesome } from 'react-native-vector-icons';
 import { Footer } from "../components/Footer";
 import { reducerCaseActions } from "../utils/constants";
 import { useStateProvider } from "../utils/stateprovider";
 import { fetchSearchResults } from "../utils/spotify";
+import { MusicCard } from "../components/MusicCard";
+import ScrollViewIndicator from 'react-native-scroll-indicator';
 
 const Search= ({navigation}) =>  {
   const [{ albums, artists, token, tracks }, dispatch] = useStateProvider();
-
   const [searchQuery, setSearchQuery] = useState(""); //for searching text from input field
 
   //set the default search category type and ability to change it.
@@ -53,7 +53,7 @@ const Search= ({navigation}) =>  {
     if (tracks) {
       console.log('tracks: ', tracks)
     }
-  } ,[albums, artists, tracks, searchQuery])
+  } ,[albums, artists, tracks, searchQuery, token])
   return (
   <SafeAreaView style={styles.container}>
     <View style= {styles.subContainer}>
@@ -64,7 +64,11 @@ const Search= ({navigation}) =>  {
           end={[.75, .75]}
           locations={[0.02, 0.27, 0.84,0.96,0.99]}
           style={styles.linearGradient}>
-        <ScrollView>
+        <ScrollViewIndicator
+            shouldIndicatorHide={false}
+            flexibleIndicator={false}
+            scrollIndicatorStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.6)' }}
+            >
 
           {/* TEMPORARY TITLE TEXT*/}          
           <Text style={styles.title}> Search Default Page</Text>
@@ -95,7 +99,7 @@ const Search= ({navigation}) =>  {
                 <Pressable 
                   style={[selectedCategory === 'artists' ? styles.selectedBtn : styles.defaultBtn]} 
                   onPress={() => setCategory('artists')}>
-                      <Text style={selectedCategory === 'artists' ? styles.selectedText : styles.defaultText}>Albums</Text>
+                      <Text style={selectedCategory === 'artists' ? styles.selectedText : styles.defaultText}>Artists</Text>
                 </Pressable>
                 <Pressable 
                   style={[selectedCategory === 'tracks' ? styles.selectedBtn : styles.defaultBtn]} 
@@ -105,7 +109,80 @@ const Search= ({navigation}) =>  {
             </View>
           </View>
           {/* Area to display results cards*/}
-        </ScrollView>
+
+          {/* SHOW ALBUM SEARCH RESULTS*/}
+          {selectedCategory == 'albums' && albums && albums.items ? (
+            <>
+              <ScrollView horizontal> 
+                <>
+                  <View style={styles.cardContainer}>
+                    <FlatList
+                      data={albums.items}
+                      renderItem={({ item }) => 
+                      /*Album results to display only album images and names & artist*/
+                      <MusicCard 
+                        album={{ name: item.name, image: item.images[0] }}
+                        artist={item.artists}
+                        />}
+                      numColumns={5}
+                      showsHorizontalScrollIndicator={false}
+                      keyExtractor={(item, index) => index.toString()}
+                    />
+                  </View>
+                </>
+              </ScrollView>
+            </>
+          ) : (<></>)}
+
+          {/* SHOW ARTIST SEARCH RESULTS*/}
+          {selectedCategory == 'artists' && artists && artists.items ? (
+            <>
+              <ScrollView horizontal> 
+                <>
+                  <View style={styles.cardContainer}>
+                    <FlatList
+                      data={artists.items}
+                      renderItem={({ item }) => 
+                      /*Artist results that only show artist name & image*/
+                      <MusicCard 
+                        album={{ image: item.images[0] }}
+                        artist={item}
+                        />}
+                      numColumns={5}
+                      showsHorizontalScrollIndicator={false}
+                      keyExtractor={(item, index) => index.toString()}
+                    />
+                  </View>
+                </>
+              </ScrollView>
+            </>
+          ) : (<></>)}
+
+          {/* SHOW TRACK SEARCH RESULTS*/}
+          {selectedCategory == 'tracks' && tracks && tracks.items ? (
+            <>
+              <ScrollView horizontal> 
+                <>
+                  <View style={styles.cardContainer}>
+                    <FlatList
+                      data={tracks.items}
+                      renderItem={({ item }) => 
+                      /*Track results show artist, album, and name data*/
+                      <MusicCard 
+                        trackName={item.name}
+                        album={{ name: item.album.name, image: item.album.images[0] }}
+                        artist={item.artists}
+                        />}
+                      numColumns={5}
+                      showsHorizontalScrollIndicator={false}
+                      keyExtractor={(item, index) => index.toString()}
+                    />
+                  </View>
+                </>
+              </ScrollView>
+            </>
+          ) : (<></>)}
+        </ScrollViewIndicator>
       </LinearGradient>
     </View>
     <View style={styles.footerLine} />
@@ -213,6 +290,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     letterSpacing: 2,
+  },
+  /*card like views*/
+  cardContainer: {
+    marginTop: 14, 
+    marginBottom: 16,
+    marginStart: 10, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'space-between', 
+    flexWrap: 'wrap',
+    minWidth: 950,
+    backgroundColor: 'rgba(50, 242, 134, 0.27)',
   },
   /*line that separates the bottom player from the upper components */
   footerLine:{
