@@ -13,6 +13,7 @@ const scopes = [
   "user-read-recently-played",
   "user-read-playback-state",
   "user-top-read",
+  "user-follow-read",
   "user-modify-playback-state",
   "streaming",
   "user-read-email",
@@ -92,8 +93,6 @@ export const saveAuthToken = async () => {
     const accessToken = await getAccessToken();
     try {
       await AsyncStorage.setItem("access_token", accessToken);
-      savedToken = accessToken
-
     } catch {
       console.log(error);
     }  
@@ -142,11 +141,11 @@ export async function fetchRecentlyPlayed(token) {
   return await response.json();
 }
 
-export async function fetchUsersTopItems(type) {
-  const response = await fetch(`${SPOTIFY_API_URL}/me/top/{type}?limit=10`, {
+export async function fetchUsersTopItems(type, token) {
+  const response = await fetch(`${SPOTIFY_API_URL}/me/top/${type}?limit=10`, {
     method: "GET", 
     headers: {
-          Authorization: `Bearer ${savedToken}`
+          Authorization: `Bearer ${token}`
         }
   });
   console.log(response);
@@ -154,11 +153,42 @@ export async function fetchUsersTopItems(type) {
 }
 
 //can use user's top songs/artists to get recommendations 
-export async function fetchRecommedations(top_artists, top_genres, top_tracks) {
+export async function fetchRecommedations(top_artists, top_genres, top_tracks, token) {
   const response = await fetch(`${SPOTIFY_API_URL}/recommendations?limit=5&seed_artists=${top_artists}&seed_genres=${top_genres}&seed_tracks=${top_tracks}`, {
     method: "GET", 
     headers: {
-          Authorization: `Bearer ${savedToken}`
+          Authorization: `Bearer ${token}`
+        }
+  });
+  console.log(response);
+  return await response.json();
+}
+/* Fetch Artist, Albums, Songs for Library Page */
+export async function fetchSavedTracks(token) {
+  const response = await fetch(`${SPOTIFY_API_URL}/me/tracks`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${token}`
+        }
+  });
+  console.log(response);
+  return await response.json();
+}
+export async function fetchSavedAlbums(token) {
+  const response = await fetch(`${SPOTIFY_API_URL}/me/albums`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${token}`
+        }
+  });
+  console.log(response);
+  return await response.json();
+}
+export async function fetchFollowedArtists(token) {
+  const response = await fetch(`${SPOTIFY_API_URL}/me/following?type=artist`, {
+    method: "GET", 
+    headers: {
+          Authorization: `Bearer ${token}`
         }
   });
   console.log(response);
@@ -167,11 +197,11 @@ export async function fetchRecommedations(top_artists, top_genres, top_tracks) {
 /*=======================================================
 =            Fetch Spotify Data Logic              =
 =======================================================*/
-export async function fetchPlaylist(playlist_id) {
+export async function fetchPlaylist(playlist_id, token) {
   const response = await fetch(`${SPOTIFY_API_URL}/playlists/${playlist_id}`, {
     method: "GET", 
     headers: {
-          Authorization: `Bearer ${savedToken}`
+          Authorization: `Bearer ${token}`
         }
   });
   console.log(response);

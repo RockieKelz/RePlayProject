@@ -7,6 +7,11 @@ export const initialState = {
   artists: null,
   currentPlaying: null,
   featuredPlaylists: null,
+  library: {
+    albums: null,
+    artists: null,
+    tracks: null,
+  },
   newReleases: null,
   usersPlaylists: null,
   playerState: false,
@@ -37,10 +42,12 @@ const reducer = (state, action) => {
         userID: action.userID,
         profileImage: action.profileImage,}
       };
-      case reducerCaseActions.SET_ALBUMS:
+      case reducerCaseActions.SET_LIBRARY:
       return {
-        ...state,
+        ...state, library: {
         albums: action.albums,
+        artists: action.artists,
+        tracks: action.tracks,}
       };
       case reducerCaseActions.SET_FEATURED:
       return {

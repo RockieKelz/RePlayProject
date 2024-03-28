@@ -5,7 +5,7 @@ import Search from './pages/Search';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import LibraryScreen from './pages/Library';
+import Library from './pages/Library';
 import { reducerCaseActions } from './utils/constants';
 import { useStateProvider } from './utils/stateprovider';
 
@@ -38,7 +38,7 @@ function App () {
               <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown:false}}>
                 <Stack.Screen name="Home" component={Home} />
                 <Stack.Screen name="Search" component={Search} />
-                <Stack.Screen name="Library" component={LibraryScreen} />
+                <Stack.Screen name="Library" component={Library} />
               </Stack.Navigator>
             </NavigationContainer>
             :
