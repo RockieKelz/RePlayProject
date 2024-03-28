@@ -68,7 +68,7 @@ This use effect will be deleted once the data section is completed */
   if (newReleases != null) {
     console.log('New Releases: ', newReleases)
   }
-}, [recentlyplayed, user, featuredPlaylists, newReleases, token]);
+}, [recentlyplayed, user, featuredPlaylists, newReleases]);
 
   /* create a song card that will display song's data */
   
@@ -82,7 +82,7 @@ This use effect will be deleted once the data section is completed */
       <View style= {styles.subContainer}>
         <SideBar navigation={navigation} />
         <LinearGradient 
-              colors={['rgba(0, 17, 236, 1)',"rgba(12,90,249,1)", 'rgba(48,138,239,1)','rgba(0,255,96,1)']} 
+              colors={['rgba(0, 17, 236, 1)',"rgba(12,90,249,1)", 'rgba(48,138,239,1)', 'rgba(24,198,143,1)','rgba(0,255,96,1)']} 
               start={[0.5, .02]}
               end={[.75, .75]}
               locations={[0.02, 0.27, 0.84,0.96,0.99]}
@@ -260,20 +260,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     minWidth: 950,
     backgroundColor: 'rgba(50, 242, 134, 0.27)',
-  },
-  card:{
-    height: 245,
-    backgroundColor: 'rgba(0, 245, 255, 0.80)',
-    borderRadius: 2,
-    shadowColor: '#000', 
-    shadowOffset: { width: 2, height: 4 }, 
-    shadowOpacity: 0.2, 
-    shadowRadius: 2, 
-    elevation: 2, 
-    padding: 12,
-    margin: 10,
-    alignItems: 'center', 
-    minWidth: 165,
   },
   labelName: {
     fontSize: 14,

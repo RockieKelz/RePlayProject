@@ -8,7 +8,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LibraryScreen from './pages/Library';
 import { reducerCaseActions } from './utils/constants';
 import { useStateProvider } from './utils/stateprovider';
-import { code, saveAuthToken } from './utils/spotify';
 
 function App () {
   const Stack = createNativeStackNavigator();
@@ -19,28 +18,19 @@ function App () {
     const fetchToken = async () => {
       //try to get access token from async storage
       var storedTokenState = await AsyncStorage.getItem("access_token");
-      //retrieve a token from spotify and save it if there isn't one granted
-      if  (storedTokenState == null) {
-          if (code) {
-            try { 
-              await saveAuthToken()
-              const token = await AsyncStorage.getItem("access_token");
-              if (token !== null) { 
-                //dispatch the action to set the token and update state
-                dispatch({ type: reducerCaseActions.SET_TOKEN, token });
-              }
-            } catch (error) {
-              console.log(error);
-            }
-          }
-        } else {
+
+      if (storedTokenState !== null) {
           //if there is already a token saved, update the state
           token = storedTokenState;
+          console.log('app token: ', token)
           dispatch({ type: reducerCaseActions.SET_TOKEN, token });
         };
       };
     fetchToken();
-    }, [dispatch, token]);
+    if (token) {
+      console.log('token: ', token)
+    }
+    }, []);
 
   return (
       token ?
