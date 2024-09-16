@@ -1,34 +1,43 @@
-import React, {useEffect, useState} from "react";
-import { FlatList, Text, StyleSheet, View, Pressable } from 'react-native';
-import { MdHomeFilled, MdSearch } from "react-icons/md";
-import { LinearGradient } from 'expo-linear-gradient'
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useRef } from "react";
 import { IoLibrary } from "react-icons/io5";
-import { fetchUsersPlaylists } from "../utils/spotify";
+import { MdHomeFilled, MdSearch } from "react-icons/md";
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import ScrollViewIndicator from 'react-native-scroll-indicator';
 import { reducerCaseActions } from "../utils/constants";
+import { fetchUsersPlaylists } from "../utils/spotify";
 import { useStateProvider } from "../utils/stateprovider";
 
 
 export function SideBar({navigation}) {
     const [{ token, usersPlaylists}, dispatch] = useStateProvider();
+    const sidebarRef = useRef(true);
 
-    useEffect(() =>  {
-        const getUserPlaylistData = async () => {
-            try {
-                var usersPlaylistsData = await fetchUsersPlaylists(token);
-                dispatch({ 
-                  type: reducerCaseActions.SET_PLAYLISTS, 
-                  usersPlaylists: usersPlaylistsData.items,
-                });
-            } catch (err) {
-                console.log(err);
-            }
-        };
-        getUserPlaylistData();
-    }, []);
+    const getUserPlaylistData = async () => {
+        try {
+            var usersPlaylistsData = await fetchUsersPlaylists(token);
+            dispatch({ 
+                type: reducerCaseActions.SET_PLAYLISTS, 
+                usersPlaylists: usersPlaylistsData.items,
+            });
+        } catch (err) {
+            console.log(err);
+        }
+    };
+    const changeCurrentPlaylist = (selectedPlaylistId) => {
+        dispatch({ type: reducerCaseActions.SET_PLAYLIST_ID, selectedPlaylistId });
+        console.log('playlist pressed: ', selectedPlaylistId)
+        navigation.push('Playlist');
+      };
+
     useEffect(() => {
-        if (usersPlaylists) {
-          console.log(usersPlaylists);
+        if (sidebarRef.current)
+        {
+            if (!usersPlaylists) {
+                getUserPlaylistData();
+                console.log(usersPlaylists);
+                sidebarRef.current = false;
+            }
         }
       }, [usersPlaylists]);
     return (
@@ -36,49 +45,51 @@ export function SideBar({navigation}) {
             colors={["#EEEEEE", 'rgba(15,251,35,1)','#00F260', '#0575E6']}
             start={[0.5, .1]}
             end={[1, .75]}
-            style={Container.linearGradient}
+            style={[Container.linearGradient, Container.linearGradient]}
         >
             <ScrollViewIndicator
             shouldIndicatorHide={false}
             flexibleIndicator={false}
             scrollIndicatorStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.6)' }}
             >
-            <View style ={Container.menuList}>
-                <Pressable style = {Container.rowItems}
+            <View style ={[Container.menuList, Container.menuList]}>
+                <Pressable style = {[Container.rowItems, Container.rowItems]}
                 onPress={() => navigation.navigate('Home')}>
                     {/* Home navigation */}
                     <MdHomeFilled />
-                    <Text style={Container.text}>
+                    <Text style={[Container.text, Container.text]}>
                         Home
                     </Text>
                 </Pressable>
-                <Pressable style = {Container.rowItems}
+                <Pressable style = {[Container.rowItems, Container.rowItems]}
                     onPress={() => navigation.navigate('Search')}>
                     {/* Search navigation*/}
                     <MdSearch />
-                    <Text style={Container.text}>
+                    <Text style={[Container. text, Container.text]}>
                         Search
                     </Text>
                 </Pressable>
-                <Pressable style = {Container.rowItems}
+                <Pressable style = {[Container.rowItems, Container.rowItems]}
                 onPress={() => navigation.navigate('Library')}>
                     {/* Library navigation*/}
                     <IoLibrary />
-                    <Text style={Container.text}>
+                    <Text style={[Container.text, Container.text]}>
                         Library
                     </Text>
                 </Pressable>
-                <Text style={Container.playlistTitleText}>
+                <Pressable 
+                    onPress={() => navigation.navigate('Playlist')}>
+                <Text style={[Container.playlistTitleText, Container.playlistTitleText]}>
                     Playlists
-                </Text>
-                <View style={Container.line}/>
+                </Text></Pressable>
+                <View style={[Container.line, Container.line]}/>
                 {usersPlaylists ? (
                     <FlatList
                     data={usersPlaylists}
                     renderItem={({ item }) => 
                     <Pressable 
-                    onPress={{}}>
-                    <Text style={Container.playlistsText}>{item.name}</Text>    
+                    onPress={() => {{changeCurrentPlaylist(item.id)}}}>
+                    <Text style={[Container.playlistsText, Container.playlistsText]}>{item.name}</Text>    
                     </Pressable> }      
                     />
                     ) : (<></>)}

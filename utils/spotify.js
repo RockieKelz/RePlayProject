@@ -4,10 +4,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 =            Authorization Logic            =
 =======================================================*/
 const authEndpoint = "https://accounts.spotify.com/authorize";
-const redirectUri = "http://localhost:19006/PostLogin";
+const redirectUri = "http://localhost:19006/Home";
 const clientId = "fa3defefdad641c9bc8540d03281e562";
 const params = new URLSearchParams(window.location.search);
-export const code = params.get("code");
+export let code = params.get("code");
 const scopes = [
   "user-read-currently-playing",
   "user-read-recently-played",
@@ -68,7 +68,7 @@ export const handleLoginAuth =async ()=>{
 
 //get the access token from spotify 
 export async function getAccessToken() {
-  const verifier = await AsyncStorage.getItem("verifier");
+  let verifier = await AsyncStorage.getItem("verifier");
 
   const params = new URLSearchParams();
   params.append("client_id", clientId);
@@ -87,7 +87,6 @@ export async function getAccessToken() {
   return access_token.access_token;
 }
 
-let savedToken = await AsyncStorage.getItem("access_token");
 //save the access token using async storage
 export const saveAuthToken = async () => {
     const accessToken = await getAccessToken();
@@ -120,14 +119,26 @@ export async function fetchProfile(token) {
 }
 
 export async function fetchUsersPlaylists(token) {
-  const response = await fetch(`${SPOTIFY_API_URL}/me/playlists`, {
-    method: "GET", 
-    headers: {
-          'Authorization': `Bearer ${token}`
-      }
-  });
-  console.log(response);
-  return response.json();
+  try {
+    const response = await fetch(`${SPOTIFY_API_URL}/me/playlists`, {
+      method: "GET", 
+      headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    if (response.status === 429) {
+      const retryAfter = response.headers.get('Retry-After');
+      console.log(`Rate limit exceeded. Retrying after ${retryAfter} seconds.`);
+      setTimeout(() => fetchUsersPlaylists(token), retryAfter * 1000);
+    } else if (response.ok) {
+      console.log(response);
+      return await response.json();
+    } else {
+      console.error('Error fetching playlists:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Fetch error:', error);
+  }
 }
 
 export async function fetchRecentlyPlayed(token) {

@@ -17,7 +17,7 @@ export const initialState = {
   playerState: false,
   recentlyplayed: null,
   selectedPlaylist: null,
-  selectedPlaylistId: "37i9dQZF1E37jO8SiMT0yN",
+  selectedPlaylistId: "37i9dQZF1DX0XUsuxWHRQd", //defaults selected playlist to featured music
   tracks: null,
   user: {
     displayName: null,
@@ -92,6 +92,11 @@ const reducer = (state, action) => {
         tracks: action.tracks,
         albums: action.albums,
       };
+      case reducerCaseActions.SET_SELECTED_PLAYLISTS:
+        return {
+          ...state,
+          selectedPlaylist: action.selectedPlaylist,
+        };
     case reducerCaseActions.LOGOUT:
       return { ...initialState }
     default:

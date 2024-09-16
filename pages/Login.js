@@ -1,28 +1,10 @@
 import React from "react";
 import { Pressable, Text, StyleSheet, View} from 'react-native';
-import { handleLoginAuth, code, saveAuthToken }  from "../utils/spotify";
-import { useStateProvider } from "../utils/stateprovider";
+import { handleLoginAuth }  from "../utils/spotify";
 
 const Login= () =>  {
-  var [ dispatch] = useStateProvider();
-
   const handleLogin = async () => {
     handleLoginAuth(); //redirects and allows user to authorize spotify profile usage
-          
-    //retrieve a token from spotify and save it if there isn't one granted
-    if (code) {
-      try { 
-          await saveAuthToken()
-          const token = await AsyncStorage.getItem("access_token");
-          console.log('token: ', token)
-          if (token !== null ) { 
-            //dispatch the action to set the token and update state
-            dispatch({ type: reducerCaseActions.SET_TOKEN, token });
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
   };
 
   return (

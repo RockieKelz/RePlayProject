@@ -1,16 +1,17 @@
-import React, {useState, useEffect} from "react";
-import { FlatList, Image, Pressable, SafeAreaView,Text, ScrollView, StyleSheet, View } from 'react-native';
-import { fetchFeaturedPlaylists, fetchNewReleases, fetchProfile, fetchRecentlyPlayed, logOut } from "../utils/spotify";
-import { SideBar } from "../components/SideBar";
-import { LinearGradient } from 'expo-linear-gradient'
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useRef } from 'react';
+import { FlatList, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import ScrollViewIndicator from 'react-native-scroll-indicator';
 import { Footer } from "../components/Footer";
-import { useStateProvider } from "../utils/stateprovider";
-import { reducerCaseActions } from "../utils/constants";
 import { MusicCard } from "../components/MusicCard";
+import { SideBar } from "../components/SideBar";
+import { reducerCaseActions } from "../utils/constants";
+import { fetchFeaturedPlaylists, fetchNewReleases, fetchProfile, fetchRecentlyPlayed, logOut } from "../utils/spotify";
+import { useStateProvider } from "../utils/stateprovider";
 
 const Home =  ({navigation}) => {
   const [{ token, featuredPlaylists, newReleases, recentlyplayed, user }, dispatch] = useStateProvider();
+  const dataRetrieval = useRef(false);
 
 //Get the users profile and recent data from spotify
  useEffect(() => {
@@ -47,39 +48,21 @@ const Home =  ({navigation}) => {
       }
     }
  };
+ if (dataRetrieval.current) return;
     getUserData();
+    dataRetrieval.current = true
  }, []);
-
-/* Temporary: shows the retrieved data response on console to help get the needed keywords from api response 
-This use effect will be deleted once the data section is completed */
- useEffect(() => {
-  if (token) {
-    console.log('token: ', token)
-  }
-  if (user) {
-    console.log('User: ', user)
-  }
-  if (recentlyplayed) {
-    console.log('Recently Played:', recentlyplayed.items);
-  }
-  if (featuredPlaylists != null) {
-    console.log('Featured Playlists: ', featuredPlaylists);
-  }
-  if (newReleases != null) {
-    console.log('New Releases: ', newReleases)
-  }
-}, [recentlyplayed, user, featuredPlaylists, newReleases]);
 
   /* create a song card that will display song's data */
   
   const logOutReset = () => {
-    dispatch(reducerCaseActions.LOGOUT);
+    dispatch({type: reducerCaseActions.LOGOUT});
     logOut();
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style= {styles.subContainer}>
+    <SafeAreaView style={[styles.container, {flexDirection: 'column'}]}>
+      <View style= {[styles.container, styles.subContainer]}>
         <SideBar navigation={navigation} />
         <LinearGradient 
               colors={['rgba(0, 17, 236, 1)',"rgba(12,90,249,1)", 'rgba(48,138,239,1)', 'rgba(24,198,143,1)','rgba(0,255,96,1)']} 
@@ -93,9 +76,8 @@ This use effect will be deleted once the data section is completed */
             scrollIndicatorStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.6)' }}
             >
             {/*Welcome Text*/}            
-            <View style={{paddingTop: 20, alignItems:'left', 
-                              justifyContent:'center', flex:1}}>
-                <Text style={styles.title}> Welcome
+            <View style={[styles.text]}>
+                <Text style={[styles.title]}> Welcome
                 {/*display username is user isn't null*/}
                   {user && (<>
                     <Text> {user.displayName}</Text>
@@ -104,13 +86,13 @@ This use effect will be deleted once the data section is completed */
                 {/*display recently played songs if there are any*/}
                 {recentlyplayed && recentlyplayed.items ? (
                   <>
-                <Text style={styles.title}>
+                <Text style={[ styles.title]}>
                    Recently Played Songs
                 </Text>
                 {/* scroll box that will hold 2 rows of recently played song data cards*/}
                 <ScrollView horizontal> 
                   <>
-                    <View style={styles.cardContainer}>
+                    <View style={[ styles.cardContainer]}>
                       <FlatList
                         data={recentlyplayed.items}
                         renderItem={({ item }) => 
@@ -131,13 +113,13 @@ This use effect will be deleted once the data section is completed */
                   {/*display new releases if there are any*/}
                 {newReleases && newReleases.albums ? (
                   <>
-                <Text style={styles.title}>
+                <Text style={[styles.title]}>
                    New Releases
                 </Text>
                 {/* scroll box that will hold 2 rows of new release data cards*/}
                 <ScrollView horizontal> 
                   <>
-                    <View style={styles.cardContainer}>
+                  <View style={[ styles.cardContainer]}>
                       <FlatList
                         data={newReleases.albums.items}
                         renderItem={({ item }) => 
@@ -159,13 +141,13 @@ This use effect will be deleted once the data section is completed */
                 {/*display featured playlists if there are any*/}
                 {featuredPlaylists && featuredPlaylists.playlists ? (
                 <>
-                <Text style={styles.title}>
+                <Text style={[styles.title]}>
                    Featured Playlists
                 </Text>
                 {/* scroll box that will hold 2 rows of playlist data cards*/}
                 <ScrollView horizontal> 
                   <>
-                    <View style={styles.cardContainer}>
+                    <View style={[styles.cardContainer]}>
                       <FlatList
                         data={featuredPlaylists.playlists.items}
                         renderItem={({ item }) => 
@@ -185,9 +167,9 @@ This use effect will be deleted once the data section is completed */
             </View>
                 {/*Temporary logout button to test authorization code*/}
                 <Pressable 
-                  style={styles.btn} 
+                  style={[ styles.btn]} 
                   onPress={logOutReset}>
-                <Text style={styles.logoutText}>Log Out</Text>
+                <Text style={[styles.logoutText]}>Log Out</Text>
                 </Pressable>
           
           </ScrollViewIndicator>
@@ -203,29 +185,26 @@ This use effect will be deleted once the data section is completed */
 export default Home
 
 const styles = StyleSheet.create({
-  container:{
+  container: {
     flex: 1,
-    flexDirection: 'column',
     backgroundColor: 'blue',
   },
   /*view that will hold side menu and main content*/
-  subContainer:{
-    display: 'flex',
+  subContainer: {
     flexDirection: 'row',
     height: '85%'
   },
   /*holder for the colored background*/
-  linearGradient:{
+  linearGradient: {
     flex: 2,
     opacity: 0.85,
     maxHeight: '100%',
   },
-  title:{
+  title: {
     fontFamily: "Arial",
     fontSize: 22,
     fontWeight: '700',
     color: 'rgba(112, 1, 177, 1)',
-    tintColor: 'black',
     backgroundColor: 'rgba(50, 242, 134, 0.77)',
     minHeight: 35,
     maxHeight: 65,
@@ -233,8 +212,16 @@ const styles = StyleSheet.create({
     minWidth: 135,
     borderTopRightRadius: 12,
     borderBottomLeftRadius: 12,
+    borderBottomLeftRadius:12,
+    borderBottomRightRadius: 12,
     padding: 10,
     margin: 15,
+  },
+  text:{
+    paddingTop: 20, 
+    alignItems:'left', 
+    justifyContent:'center', 
+    flex:1
   },
   /*logout */
   btn: {
@@ -295,9 +282,9 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   /*line that separates the bottom player from the upper components */
-  footerLine:{
+  footerLine: {
     borderBottomColor: "#7001b1",
     borderBottomWidth: 5,
     width: "100%",
-  }
+  },
 });

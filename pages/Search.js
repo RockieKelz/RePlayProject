@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { FlatList, Pressable, SafeAreaView,Text, TextInput, ScrollView, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { SideBar } from "../components/SideBar";
+import React, { useEffect, useState } from "react";
+import { FlatList, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import ScrollViewIndicator from 'react-native-scroll-indicator';
 import { FontAwesome } from 'react-native-vector-icons';
 import { Footer } from "../components/Footer";
-import { reducerCaseActions } from "../utils/constants";
-import { useStateProvider } from "../utils/stateprovider";
-import { fetchSearchResults } from "../utils/spotify";
 import { MusicCard } from "../components/MusicCard";
-import ScrollViewIndicator from 'react-native-scroll-indicator';
+import { SideBar } from "../components/SideBar";
+import { reducerCaseActions } from "../utils/constants";
+import { fetchSearchResults } from "../utils/spotify";
+import { useStateProvider } from "../utils/stateprovider";
+
 
 const Search= ({navigation}) =>  {
   const [{ albums, artists, token, tracks }, dispatch] = useStateProvider();
@@ -77,7 +78,7 @@ const Search= ({navigation}) =>  {
             {/*search bar*/}
             <View style={styles.searchContainer}> 
               <FontAwesome 
-                name="search" 
+                icon="fa-solid fa-magnifying-glass"
                 size={20} 
                 color="purple" 
                 onClick={{}}

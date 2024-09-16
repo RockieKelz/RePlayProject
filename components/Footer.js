@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { LinearGradient } from 'expo-linear-gradient'
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { BsPlayFill, BsPauseFill, BsShuffle, BsRepeat, BsVolumeDown, BsVolumeUp} from "react-icons/bs";
 import { CgPlayTrackNext, CgPlayTrackPrev } from "react-icons/cg";
 import  Slider from '@react-native-community/slider';
@@ -12,60 +12,60 @@ export function Footer() {
     const [duration, setDuration] = useState(0) //for duration of song
 
     return (
-    <View style = {Container.background}>
+    <View style = {[Container.background,]}>
         <LinearGradient 
             colors={['rgba(10,80,249,0.55)','rgba(12,220,116,.55)', 'rgba(12,90,249,.85)','rgba(12,220,116,.55)','#0575E6','rgba(12,220,116,.55)', 'rgba(10,80,249,0.55)']}
             start={[0, 1]}
             end={[0, 1]}
-            style={Container.linearGradient} >
-            <View style={Container.playerContainer}>
+            style={[Container.linearGradient,]} >
+            <View style={[Container.playerContainer, ]}>
                 {/*separate playback controls and progress into 2 levels of container*/}
-                <View style={Container.playbackContainer}>
+                <View style={[Container.playbackContainer, ]}>
                 {/* Playback controls*/}
-                <View style = {Container.playbackControlsContainer}>
+                <View style = {[Container.playbackControlsContainer, ]}>
                     <Pressable>
-                        <View style = {Container.playerIcon}>
+                        <View style = {[Container.playerIcon, ]}>
                             <BsShuffle style = {{ fontSize: 18}}/>
                         </View>
                     </Pressable>
                     <Pressable>
-                        <View style = {Container.playerIcon}>
+                        <View style = {[Container.playIcon, ]}>
                             <CgPlayTrackPrev style = {{ fontSize: 26}} />
                         </View>
                     </Pressable>
                     {/* Toggle play/pause based on playback*/}
                     <Pressable 
-                        style={Container.playButton}
+                        style={[Container.playButton, ]}
                         onPress={() => setIsPlaying(!isPlaying)}>
-                        <View style={Container.playIcon}>
+                        <View style={[Container.playIcon, ]}>
                             {isPlaying ? <BsPauseFill /> : <BsPlayFill />}
                         </View>
                     </Pressable>
                     <Pressable>
-                        <View style = {Container.playerIcon}>
+                        <View style = {[Container.playerIcon, ]}>
                             <CgPlayTrackNext style = {{ fontSize: 26}} />
                         </View>
                     </Pressable>
                     <Pressable >
-                        <View style = {Container.playerIcon}>
+                        <View style = {[Container.playerIcon, ]}>
                             <BsRepeat style = {{ fontSize: 19}} />
                         </View>
                     </Pressable>
                     </View>
                 {/* Progress bar*/}
-                <View style={Container.progressContainer} >
-                    <View style={Container.progress} >
+                <View style={[Container.progressContainer,  ]} >
+                    <View style={[Container.progress, ]} >
                         <View style={[Container.progressBar, {width: `${progress/duration*100}%` }]} >
                         </View>
                     </View>
                 </View>
                 </View>
                 {/* Volume controls*/}
-                <View style = {Container.volContainer}>
+                <View style = {[Container.volContainer,  ]}>
                     <Pressable style={Container.playerIcon}>
                         <BsVolumeUp style={{ marginLeft: 20, fontSize: 26 }} />
                     </Pressable>
-                    <View style={Container.sliderContainer} >
+                    <View style={[Container.sliderContainer, ]} >
                         <Slider
                             width={75}              
                             minimumValue={0}
@@ -86,9 +86,8 @@ export function Footer() {
 }
 const Container = StyleSheet.create({
     background: {
-        flex: 1,
         width: '100%',
-        height: '100%',
+        height: '15%',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(10,80,249,0.85)'
