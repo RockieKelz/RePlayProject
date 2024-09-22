@@ -78,35 +78,35 @@ const Playlists = ({navigation}) => {
                     <View style={{flexDirection:'row', margin: 30}}>
                         {/*display playlist name, image, and description*/}
                         <Image source={{ uri: selectedPlaylist.image }} style={styles.image}/>
-                        <View style={{flexDirection:'column', alignItems:'stretch'}}>
+                        <View style={{flexDirection:'column', alignItems:'stretch', backgroundColor: 'rgba(0,240,215,.25)', borderRadius: 13, paddingEnd: 10}}>
                             <Text style={styles.title}>{selectedPlaylist.name}</Text>
-                            <Text>{selectedPlaylist.description}</Text>
+                            <Text style={[styles.title, { fontFamily: "Segoe UI", fontSize: 15, marginTop: 10, fontWeight: '300',}]}>{selectedPlaylist.description}</Text>
                         </View>
                     </View>
                     {/*playlist details: HEADINGS*/}
-                    <View style={{ flexDirection: 'row',  marginRight: 20, justifyContent: 'space-between', padding: 10 }}>
+                    <View style={{ flexDirection: 'row', marginRight: 25, marginLeft: 10, justifyContent: 'space-between', padding: 10, borderBottomWidth: 1, borderBottomColor: '#fff' }}>
                         <View style={{ flexDirection: 'row'}}>
-                        <Text style= {styles.text}>#</Text>
-                        <Text>TITLE</Text>
+                        <Text style= {[styles.text, { fontWeight: '600'}]}>#</Text>
+                        <Text style= {[styles.text, { marginRight: 0, marginLeft: 10, fontWeight: '600'}]}>TITLE</Text>
                         </View>
-                        <Text>ALBUM</Text>
-                        <WiTime2 />
+                        <Text style= {[styles.text, { marginRight: 30,fontWeight: '600'}]}>ALBUM</Text>
+                        <WiTime2 style= {{ marginRight: 0, color: "#fff", fontWeight: '600'}} />
                     </View>
                     {/*playlist details: SONG DETAILS*/}
                     {selectedPlaylist.tracks.map((track, index) => (
-                    <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10 }}>
-                         <View style={{ flexDirection: 'row', maxWidth: 300}}>
-                        <Text style= {styles.text}>{index}</Text>
-                        <View style={{ flexDirection: 'row'}}>
-                            <Image source={{uri : track.image}} style={styles.thumbnail}/>
-                            <View style={{flexDirection: 'column'}}>
-                                <Text style= {styles.text}>{track.name}</Text>
-                                <Text style= {styles.text}>{track.artists.join(', ')}</Text>
-                            </View>
+                    <View key={index} style={{ flexDirection: 'row', flex:1 , justifyContent: 'space-between', padding: 10, marginLeft: 10}}>
+                        <View style={{ flex: 1, flexDirection: 'row'}}>
+                            <Text style= {[styles.text, { width: 20, textAlign: 'left', marginTop: 10 }]}>{index}</Text>
+                            <View style={{ flex: 2, flexDirection: 'row'}}>
+                                <Image source={{uri : track.image}} style={styles.thumbnail}/>
+                                <View style={{flexDirection: 'column', flex: 1}}>
+                                    <Text style= {[styles.text, { flex: 1 }]}>{track.name}</Text>
+                                    <Text style= {[styles.text, { flex: 1}]}>{track.artists.join(', ')}</Text>
+                                </View>
                             </View>
                         </View>
-                        <View style={{ flexDirection: 'row', alignSelf: 'flex-start'}}>
-                        <Text style= {styles.text}>{track.album}</Text>
+                        <View style={{ flex: 1}}>
+                            <Text style= {styles.text}>{track.album}</Text>
                         </View>
                         <Text style= {styles.text}>{transformDuration(track.duration)}</Text>
                     </View>
@@ -141,7 +141,6 @@ const styles = StyleSheet.create({
         maxHeight: '100%',
       },
     title:{
-      maxWidth: 280,
       marginLeft: 25,
       marginTop: 65,
       fontFamily: "Segoe UI",
@@ -149,16 +148,12 @@ const styles = StyleSheet.create({
       fontWeight: '700',
       letterSpacing: 1,
       color: '#7001b1',
-      backgroundColor: 'rgba(0,240,215,.25)',
-      borderRadius: 13,
     },
     text:{
         marginRight: 20, 
-        alignItems:'left', 
-        justifyContent:'center', 
         color: "#fff",
-        maxWidth: 215,
-        textAlign: 'left'
+        textAlign: 'left',
+        flexWrap: 'wrap'
       },
     image:{
         height: 200,
