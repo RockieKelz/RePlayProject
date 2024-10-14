@@ -80,7 +80,7 @@ const Playlists = ({navigation}) => {
                         <Image source={{ uri: selectedPlaylist.image }} style={styles.image}/>
                         <View style={{flexDirection:'column', alignItems:'stretch', backgroundColor: 'rgba(0,240,215,.25)', borderRadius: 13, paddingEnd: 10}}>
                             <Text style={styles.title}>{selectedPlaylist.name}</Text>
-                            <Text style={[styles.title, { fontFamily: "Segoe UI", fontSize: 15, marginTop: 10, fontWeight: '300',}]}>{selectedPlaylist.description}</Text>
+                            <Text style={[styles.title, { fontFamily: "Segoe UI", fontSize: 15, marginTop: 10, fontWeight: '300',flexWrap: 'wrap'}]}>{selectedPlaylist.description}</Text>
                         </View>
                     </View>
                     {/*playlist details: HEADINGS*/}

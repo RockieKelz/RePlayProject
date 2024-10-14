@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { FlatList, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Pressable, SafeAreaView, Text, useWindowDimensions, View } from 'react-native';
 import { ScrollView } from "react-native-gesture-handler";
-import { SideBar } from "../components/SideBar";
-import { useWindowDimensions } from 'react-native';
 import { Footer } from "../components/Footer";
 import { MusicCard } from "../components/MusicCard";
+import { SideBar } from "../components/SideBar";
+import { reducerCaseActions } from "../utils/constants";
 import { fetchFollowedArtists, fetchSavedAlbums, fetchSavedTracks } from "../utils/spotify";
 import { useStateProvider } from "../utils/stateprovider";
-import { reducerCaseActions } from "../utils/constants";
 
 const Library= ({navigation}) => {
     const { width } = useWindowDimensions();
@@ -18,6 +17,8 @@ const Library= ({navigation}) => {
       setSelectedCategory(category);
     };
     const [{ library, token}, dispatch] = useStateProvider();
+    // Add a state to track the loading status
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
       /*Get users saved songs, saved albums, and followed artists to create the user's library selection*/
@@ -32,8 +33,12 @@ const Library= ({navigation}) => {
           artists: userArtistsLibraryData.artists,
           tracks: userTracksLibraryData,
         });
+        // Set isLoading to false after data is fetched
+        setIsLoading(false);
       } catch (error) {
         console.log(error);
+        // Set isLoading to false even if there's an error
+        setIsLoading(false);
       }
     }
     
@@ -81,6 +86,12 @@ const Library= ({navigation}) => {
 
           {/* SHOW ALBUMS*/}                  
           <View style={styles.cardContainer}>
+          {isLoading ? (
+            // Show the loading indicator while data is being fetched
+            <ActivityIndicator size="large" color="#7001b1" />
+        ) : (
+            // Show the library data once it's fetched
+            <>
           {selectedCategory == 'Albums' && library.albums?.map((item, index) =>  (
             <View key={index} style={{flexDirection: 'row'}}>
               {/*Album results to display only album images and names & artist*/}
@@ -112,7 +123,7 @@ const Library= ({navigation}) => {
                 artist={item.track.artists}
                 />
             </View>
-          ))}
+          ))}</>)}
         </View>
 
       </ScrollView>
