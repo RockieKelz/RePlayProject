@@ -164,8 +164,8 @@ export async function fetchUsersTopItems(type, token) {
 }
 
 //can use user's top songs/artists to get recommendations 
-export async function fetchRecommedations(top_artists, top_genres, top_tracks, token) {
-  const response = await fetch(`${SPOTIFY_API_URL}/recommendations?limit=5&seed_artists=${top_artists}&seed_genres=${top_genres}&seed_tracks=${top_tracks}`, {
+export async function fetchRecommedations(top_artists, top_tracks, token) {
+  const response = await fetch(`${SPOTIFY_API_URL}/recommendations?limit=10&seed_artists=${top_artists}&seed_tracks=${top_tracks}`, {
     method: "GET", 
     headers: {
           Authorization: `Bearer ${token}`
@@ -241,11 +241,11 @@ export async function fetchNewReleases(token) {
   return await response.json();
 }
 
-export async function fetchCategories() {
+export async function fetchCategories(token) {
   const response = await fetch(`${SPOTIFY_API_URL}/browse/categories?limit=20`, {
     method: "GET", 
     headers: {
-          Authorization: `Bearer ${savedToken}`
+          Authorization: `Bearer ${token}`
         }
   });
   console.log(response);

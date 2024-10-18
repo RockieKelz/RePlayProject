@@ -7,13 +7,18 @@ import { Footer } from "../components/Footer";
 import { MusicCard } from "../components/MusicCard";
 import { SideBar } from "../components/SideBar";
 import { reducerCaseActions } from "../utils/constants";
-import { fetchSearchResults } from "../utils/spotify";
+import { fetchCategories, fetchRecommedations, fetchSearchResults, fetchUsersTopItems } from "../utils/spotify";
 import { useStateProvider } from "../utils/stateprovider";
 
 
 const Search= ({navigation}) =>  {
   const [{ albums, artists, token, tracks }, dispatch] = useStateProvider();
   const [searchQuery, setSearchQuery] = useState(""); //for searching text from input field
+  // consts to fill page when user is not seraching
+  const [usersTopArtists, setTopArtists] = useState([]);
+  const [usersTopTracks, setTopTracks] = useState([]);
+  const [usersRecommendations, setRecommendations] = useState([]);
+  const [browseCategories, setBrowseCategories] = useState([]);
 
   //set the default search category type and ability to change it.
   const [selectedCategory, setSelectedCategory] = useState('albums');
@@ -35,26 +40,60 @@ const Search= ({navigation}) =>  {
     } catch (error) {
       console.log(error);
     }}
+    /* Functions to handle fetching and dispatching browsing recomendations*/
+    // Users Top Artists & Categories */
+    async function GetUsersTopItems() {
+      try {
+        setTopArtists (await fetchUsersTopItems("artists", token));
+        setTopTracks (await fetchUsersTopItems("tracks", token));
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    async function GetUserRecommendations() {
+      try {
+        const topArtistIDs = usersTopArtists?.items.slice(0, 3).map(artist => artist.id);
+        const topTracksIDs = usersTopTracks?.items.slice(0, 2).map(track => track.id);
+        console.log('Top IDs', topArtistIDs, topTracksIDs);
+        setRecommendations(await fetchRecommedations(topArtistIDs, topTracksIDs, token));
+        console.log('Recommends', usersRecommendations);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    async function GetBrowseCategories() {
+      try {
+        setBrowseCategories(await fetchCategories(token));
+      } catch (error) {
+        console.log(error);
+      }
+    }
 
     useEffect(() => {
       /* search will temporary run as the user types in the search bar
           plan to change so that click and key events trigger the function*/
-    if (searchQuery && searchQuery.length > 0) {
-      GetSearchResult(searchQuery)
+      if (searchQuery && searchQuery.length > 0) {
+        GetSearchResult(searchQuery)
+        }
+      if (usersTopArtists.length === 0) {
+        GetUsersTopItems();
       }
-      /*TEMPORARY: 
-        shows the retrieved data response on console to help get the needed keywords from api response 
-        This use effect will be deleted once the data section is completed  */
-    if (albums) {
-      console.log('albums: ', albums)
-    }
-    if (artists) {
-      console.log('artists: ', artists)
-    }
-    if (tracks) {
-      console.log('tracks: ', tracks)
-    }
-  } ,[albums, artists, tracks, searchQuery, token])
+      if (browseCategories.length === 0) {
+        GetBrowseCategories();
+      }
+      if (usersRecommendations.length === 0 && Object.keys(usersTopArtists).length > 0 && Object.keys(usersTopTracks).length > 0) { 
+        GetUserRecommendations();
+      };
+      if (usersTopArtists && usersTopTracks) { 
+        console.log('Top Artists', usersTopArtists, 'Top Tracks', usersTopTracks);
+      };
+      if (usersRecommendations) {
+        console.log('usersRecommendations', usersRecommendations);
+      };
+      if (browseCategories) {
+        console.log('Browse Categories', browseCategories);
+      };
+    }, [ searchQuery, usersRecommendations, usersTopArtists, usersTopTracks, token])
   return (
   <SafeAreaView style={styles.container}>
     <View style= {styles.subContainer}>
@@ -70,11 +109,9 @@ const Search= ({navigation}) =>  {
             flexibleIndicator={false}
             scrollIndicatorStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.6)' }}
             >
-
-          {/* TEMPORARY TITLE TEXT*/}          
-          <Text style={styles.title}> Search Default Page</Text>
+              
           {/*search bar row*/}
-          <View style={{flexDirection:'row', justifyContent: 'space-between'}}>
+          <View style={{flexDirection:'row', justifyContent: 'space-between', paddingTop: 30}}>
             {/*search bar*/}
             <View style={styles.searchContainer}> 
               <FontAwesome 
@@ -111,6 +148,9 @@ const Search= ({navigation}) =>  {
           </View>
           {/* Area to display results cards*/}
 
+          { searchQuery && searchQuery.length > 0 ? (
+            // Display search results
+            <>
           {/* SHOW ALBUM SEARCH RESULTS*/}
           {selectedCategory == 'albums' && albums && albums.items ? (
             <>
@@ -183,6 +223,49 @@ const Search= ({navigation}) =>  {
               </ScrollView>
             </>
           ) : (<></>)}
+          </>
+        ) : (
+          /* Display user's top artists, recommendations, and browsing categories if not searching */
+          <>
+            {usersTopArtists && usersTopArtists.items ? (
+              <ScrollView horizontal>
+              <View style={styles.cardContainer}>
+                <FlatList
+                  data={usersTopArtists.items}
+                  renderItem={({ item }) => (
+                    <MusicCard
+                      album={{ image: item.images[0] }}
+                      artist={item}
+                    />
+                  )}
+                  numColumns={5}
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item, index) => index.toString()}
+                />
+              </View>
+            </ScrollView>
+            ) : (<></>)}
+          
+            {usersRecommendations && usersRecommendations.tracks ? (
+              <ScrollView horizontal>
+              <View style={styles.cardContainer}>
+                <FlatList
+                  data={usersRecommendations.tracks}
+                  renderItem={({ item }) => (
+                    <MusicCard
+                      album={{ image: item.album.images[0], name: item.album.name }}
+                      artist={item.artists}
+                      trackName={item.name}
+                    />
+                  )}
+                  numColumns={5}
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item, index) => index.toString()}
+                />
+              </View>
+            </ScrollView>
+            ) : (<></>)}
+          </>)}
         </ScrollViewIndicator>
       </LinearGradient>
     </View>
