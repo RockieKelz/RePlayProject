@@ -1,15 +1,15 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from "react";
-import { FlatList, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Dimensions, FlatList, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import ScrollViewIndicator from 'react-native-scroll-indicator';
 import { FontAwesome } from 'react-native-vector-icons';
 import { Footer } from "../components/Footer";
+import HorizontalScrollWithArrows from '../components/HorizontalScrollArrows';
 import { MusicCard } from "../components/MusicCard";
 import { SideBar } from "../components/SideBar";
 import { reducerCaseActions } from "../utils/constants";
 import { fetchCategories, fetchRecommedations, fetchSearchResults, fetchUsersTopItems } from "../utils/spotify";
 import { useStateProvider } from "../utils/stateprovider";
-
 
 const Search= ({navigation}) =>  {
   const [{ albums, artists, token, tracks }, dispatch] = useStateProvider();
@@ -26,6 +26,12 @@ const Search= ({navigation}) =>  {
     setSelectedCategory(category);
   };
 
+  const getNumColumns = () => {
+    const screenWidth = Dimensions.get('window').width;
+    const cardWidth = 200; // Adjust this value based on your desired card width
+    return Math.floor((screenWidth*.8) / cardWidth);
+  };
+  const [numColumns, setNumColumns] = useState(getNumColumns());
   //function to handle fetching and dispatching search results
   async function GetSearchResult(searchQuery){
     console.log("Searching for " + searchQuery)
@@ -70,6 +76,10 @@ const Search= ({navigation}) =>  {
     }
 
     useEffect(() => {
+      const updateLayout = () => {
+        setNumColumns(getNumColumns());
+      };
+      
       /* search will temporary run as the user types in the search bar
           plan to change so that click and key events trigger the function*/
       if (searchQuery && searchQuery.length > 0) {
@@ -84,6 +94,11 @@ const Search= ({navigation}) =>  {
       if (usersRecommendations.length === 0 && Object.keys(usersTopArtists).length > 0 && Object.keys(usersTopTracks).length > 0) { 
         GetUserRecommendations();
       };
+      /*TEMPORARY CONSOLE LOGS FOR DATA CONFIGURATION
+        =============================================
+        TODO:     
+        ***DELETE LOGS WHEN DATA DISPLAYS APPROPRIATELY ON PAGE***
+        ========================================*/ 
       if (usersTopArtists && usersTopTracks) { 
         console.log('Top Artists', usersTopArtists, 'Top Tracks', usersTopTracks);
       };
@@ -93,6 +108,10 @@ const Search= ({navigation}) =>  {
       if (browseCategories) {
         console.log('Browse Categories', browseCategories);
       };
+      Dimensions.addEventListener('change', updateLayout);
+  return () => {
+    Dimensions.removeEventListener('change', updateLayout);
+  }
     }, [ searchQuery, usersRecommendations, usersTopArtists, usersTopTracks, token])
   return (
   <SafeAreaView style={styles.container}>
@@ -226,44 +245,58 @@ const Search= ({navigation}) =>  {
           </>
         ) : (
           /* Display user's top artists, recommendations, and browsing categories if not searching */
-          <>
+          <>{/*TOP ARTISTS*/}
             {usersTopArtists && usersTopArtists.items ? (
-              <ScrollView horizontal>
-              <View style={styles.cardContainer}>
-                <FlatList
-                  data={usersTopArtists.items}
-                  renderItem={({ item }) => (
+             <View>
+             <Text style={styles.sectionTitle}>Your Top Artists</Text>
+             <HorizontalScrollWithArrows>
+              {usersTopArtists.items.map((item, index)=> (
+                <View key={index} style={styles.artistCard}>
                     <MusicCard
                       album={{ image: item.images[0] }}
                       artist={item}
                     />
-                  )}
-                  numColumns={5}
-                  showsHorizontalScrollIndicator={false}
-                  keyExtractor={(item, index) => index.toString()}
-                />
+                    </View>
+                  ))}
+                </HorizontalScrollWithArrows>
               </View>
-            </ScrollView>
+            
             ) : (<></>)}
-          
+          {/*RECOMMENDATIONS*/}
             {usersRecommendations && usersRecommendations.tracks ? (
-              <ScrollView horizontal>
-              <View style={styles.cardContainer}>
-                <FlatList
-                  data={usersRecommendations.tracks}
-                  renderItem={({ item }) => (
+              <View>
+              <Text style={styles.sectionTitle}>Your Recomendations</Text>
+              <HorizontalScrollWithArrows>
+              {usersRecommendations.tracks.map((item,index) => (
+                <View key={index} style={styles.artistCard}>
+                  
                     <MusicCard
                       album={{ image: item.album.images[0], name: item.album.name }}
                       artist={item.artists}
                       trackName={item.name}
                     />
+                    </View>
+                    ))}
+            </HorizontalScrollWithArrows>
+            </View>
+            ) : (<></>)}
+          {/*BROWSING CATERGORIES*/}
+            {browseCategories && browseCategories.categories ? (
+              <View style={(styles.cardContainer, {width: '110%'})}>
+                <FlatList
+                  data={browseCategories.categories.items}
+                  renderItem={({ item }) => (
+                    <MusicCard
+                      album={{ image: item.icons[0]}}
+                      trackName={item.name}
+                    />
                   )}
-                  numColumns={5}
+                  numColumns={numColumns}
+                  key={numColumns}
                   showsHorizontalScrollIndicator={false}
                   keyExtractor={(item, index) => index.toString()}
                 />
               </View>
-            </ScrollView>
             ) : (<></>)}
           </>)}
         </ScrollViewIndicator>
@@ -392,5 +425,17 @@ const styles = StyleSheet.create({
     borderBottomColor: "#7001b1",
     borderBottomWidth: 5,
     width: "100%",
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    marginBottom: 10,
+    color: '#fff',
+  },
+  artistCard: {
+    marginHorizontal: 5,
+    marginRight: 20,
+    width: 150, // Adjust this width as needed
   },
 })
