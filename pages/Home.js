@@ -6,7 +6,7 @@ import { Footer } from "../components/Footer";
 import { MusicCard } from "../components/MusicCard";
 import { SideBar } from "../components/SideBar";
 import { reducerCaseActions } from "../utils/constants";
-import { fetchFeaturedPlaylists, fetchNewReleases, fetchProfile, fetchRecentlyPlayed, logOut } from "../utils/spotify";
+import { fetchNewReleases, fetchProfile, fetchRecentlyPlayed, logOut } from "../utils/spotify";
 import { useStateProvider } from "../utils/stateprovider";
 
 const Home =  ({navigation}) => {
@@ -32,11 +32,6 @@ const Home =  ({navigation}) => {
           recentlyplayed: recentData,
         });
 
-        var featuredPlaylistData = await fetchFeaturedPlaylists(token);
-        dispatch({ 
-          type: reducerCaseActions.SET_FEATURED, 
-          featuredPlaylists: featuredPlaylistData,
-        });
         var newReleasesData = await fetchNewReleases(token);
         dispatch({ 
           type: reducerCaseActions.SET_NEWRELEASE, 

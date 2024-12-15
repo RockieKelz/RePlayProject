@@ -8,7 +8,7 @@ import HorizontalScrollWithArrows from '../components/HorizontalScrollArrows';
 import { MusicCard } from "../components/MusicCard";
 import { SideBar } from "../components/SideBar";
 import { reducerCaseActions } from "../utils/constants";
-import { fetchCategories, fetchRecommedations, fetchSearchResults, fetchUsersTopItems } from "../utils/spotify";
+import { fetchCategories, fetchSearchResults, fetchUsersTopItems } from "../utils/spotify";
 import { useStateProvider } from "../utils/stateprovider";
 
 const Search= ({navigation}) =>  {
@@ -17,7 +17,6 @@ const Search= ({navigation}) =>  {
   // consts to fill page when user is not seraching
   const [usersTopArtists, setTopArtists] = useState([]);
   const [usersTopTracks, setTopTracks] = useState([]);
-  const [usersRecommendations, setRecommendations] = useState([]);
   const [browseCategories, setBrowseCategories] = useState([]);
 
   //set the default search category type and ability to change it.
@@ -56,17 +55,7 @@ const Search= ({navigation}) =>  {
         console.log(error);
       }
     }
-    async function GetUserRecommendations() {
-      try {
-        const topArtistIDs = usersTopArtists?.items.slice(0, 3).map(artist => artist.id);
-        const topTracksIDs = usersTopTracks?.items.slice(0, 2).map(track => track.id);
-        console.log('Top IDs', topArtistIDs, topTracksIDs);
-        setRecommendations(await fetchRecommedations(topArtistIDs, topTracksIDs, token));
-        console.log('Recommends', usersRecommendations);
-      } catch (error) {
-        console.log(error);
-      }
-    }
+
     async function GetBrowseCategories() {
       try {
         setBrowseCategories(await fetchCategories(token));
@@ -91,9 +80,6 @@ const Search= ({navigation}) =>  {
       if (browseCategories.length === 0) {
         GetBrowseCategories();
       }
-      if (usersRecommendations.length === 0 && Object.keys(usersTopArtists).length > 0 && Object.keys(usersTopTracks).length > 0) { 
-        GetUserRecommendations();
-      };
       /*TEMPORARY CONSOLE LOGS FOR DATA CONFIGURATION
         =============================================
         TODO:     
@@ -102,9 +88,6 @@ const Search= ({navigation}) =>  {
       if (usersTopArtists && usersTopTracks) { 
         console.log('Top Artists', usersTopArtists, 'Top Tracks', usersTopTracks);
       };
-      if (usersRecommendations) {
-        console.log('usersRecommendations', usersRecommendations);
-      };
       if (browseCategories) {
         console.log('Browse Categories', browseCategories);
       };
@@ -112,7 +95,7 @@ const Search= ({navigation}) =>  {
   return () => {
     Dimensions.removeEventListener('change', updateLayout);
   }
-    }, [ searchQuery, usersRecommendations, usersTopArtists, usersTopTracks, token])
+    }, [ searchQuery, usersTopArtists, usersTopTracks, token])
   return (
   <SafeAreaView style={styles.container}>
     <View style= {styles.subContainer}>
@@ -244,7 +227,7 @@ const Search= ({navigation}) =>  {
           ) : (<></>)}
           </>
         ) : (
-          /* Display user's top artists, recommendations, and browsing categories if not searching */
+          /* Display user's top artists, top tracks, and browsing categories if not searching */
           <>{/*TOP ARTISTS*/}
             {usersTopArtists && usersTopArtists.items ? (
              <View>
@@ -262,14 +245,13 @@ const Search= ({navigation}) =>  {
               </View>
             
             ) : (<></>)}
-          {/*RECOMMENDATIONS*/}
-            {usersRecommendations && usersRecommendations.tracks ? (
+          {/*TOP TRACKS*/}
+            {usersTopTracks && usersTopTracks.items ? (
               <View>
-              <Text style={styles.sectionTitle}>Your Recomendations</Text>
+              <Text style={styles.sectionTitle}>Your Top Tracks</Text>
               <HorizontalScrollWithArrows>
-              {usersRecommendations.tracks.map((item,index) => (
+              {usersTopTracks.items.map((item,index) => (
                 <View key={index} style={styles.artistCard}>
-                  
                     <MusicCard
                       album={{ image: item.album.images[0], name: item.album.name }}
                       artist={item.artists}

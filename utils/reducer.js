@@ -6,7 +6,6 @@ export const initialState = {
   albums: null,
   artists: null,
   currentPlaying: null,
-  featuredPlaylists: null,
   library: {
     albums: null,
     artists: null,
@@ -48,11 +47,6 @@ const reducer = (state, action) => {
         albums: action.albums,
         artists: action.artists,
         tracks: action.tracks,}
-      };
-      case reducerCaseActions.SET_FEATURED:
-      return {
-        ...state,
-        featuredPlaylists: action.featuredPlaylists,
       };
       case reducerCaseActions.SET_NEWRELEASE:
       return {

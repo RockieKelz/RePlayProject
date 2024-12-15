@@ -219,17 +219,6 @@ export async function fetchPlaylist(playlist_id, token) {
   return await response.json();
 }
 
-export async function fetchFeaturedPlaylists(token) {
-  const response = await fetch(`${SPOTIFY_API_URL}/browse/featured-playlists?limit=10`, {
-    method: "GET", 
-    headers: {
-          Authorization: `Bearer ${token}`
-        }
-  });
-  console.log(response);
-  return await response.json();
-}
-
 export async function fetchNewReleases(token) {
   const response = await fetch(`${SPOTIFY_API_URL}/browse/new-releases?limit=10`, {
     method: "GET", 
