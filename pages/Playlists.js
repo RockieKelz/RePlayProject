@@ -1,7 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { BsPlayFill } from "react-icons/bs";
 import { WiTime2 } from "react-icons/wi";
-import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import ScrollViewIndicator from 'react-native-scroll-indicator';
 import { Footer } from "../components/Footer";
 import { SideBar } from "../components/SideBar";
@@ -13,6 +14,7 @@ import { convertMS } from "../utils/utils";
 const Playlists = ({navigation}) => {
     const [{ token, selectedPlaylist, selectedPlaylistId }, dispatch] = useStateProvider();
     const playlistsRef = useRef(true);
+    const [hoveredIndex, setHoveredIndex] = useState(null); // State to track hovered index
 
     //convert the track's ms duration to minute form
     const transformDuration  = (item) =>{
@@ -94,9 +96,18 @@ const Playlists = ({navigation}) => {
                     </View>
                     {/*playlist details: SONG DETAILS*/}
                     {selectedPlaylist.tracks.map((track, index) => (
-                    <View key={index} style={{ flexDirection: 'row', flex:1 , justifyContent: 'space-between', padding: 10, marginLeft: 10}}>
+                    <View 
+                    key={index} 
+                    style={[{flexDirection: 'row', flex:1 , justifyContent: 'space-between', padding: 10, marginLeft: 10}, hoveredIndex==index&&styles.hoveredRow]}
+                    onMouseEnter={() => setHoveredIndex(index)}
+                    onMouseLeave={() => setHoveredIndex(null)}>
                         <View style={{ flex: 1, flexDirection: 'row'}}>
-                            <Text style= {[styles.text, { width: 20, textAlign: 'left', marginTop: 10 }]}>{index}</Text>
+                            {hoveredIndex==index ? (<>
+                            <Pressable style={styles.hoveredButton}>
+                                <BsPlayFill style= {styles.hoveredIcon} />
+                            </Pressable>
+                            </>) : (<>
+                            <Text style= {[styles.text, { width: 20, textAlign: 'left', marginTop: 10 }]}>{index}</Text></>)}
                             <View style={{ flex: 2, flexDirection: 'row'}}>
                                 <Image source={{uri : track.image}} style={styles.thumbnail}/>
                                 <View style={{flexDirection: 'column', flex: 1}}>
@@ -140,6 +151,25 @@ const styles = StyleSheet.create({
         opacity: 0.85,
         maxHeight: '100%',
       },
+    hoveredRow: {
+        backgroundColor: 'rgba(112, 1, 177, 0.5)',
+    },
+    hoveredButton: { 
+        width: 25,
+        height: 25,
+        marginRight: 20,
+        marginTop: 8,
+        borderRadius: 25,
+        backgroundColor: 'rgba(15,251,35, 0.8)',
+        marginStart: -5,
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    hoveredIcon: {
+        color: 'rgb(255,255,255)',
+        fontSize: 26,
+        width: 20, 
+    },
     title:{
       marginLeft: 25,
       marginTop: 65,
