@@ -1,17 +1,19 @@
-import React, { useEffect, useRef } from 'react';
-import Login from "./pages/Login";
-import Home from "./pages/Home";
-import Search from './pages/Search';
-import Playlists from './pages/Playlists' 
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React, { useEffect, useRef } from 'react';
+import Home from "./pages/Home";
 import Library from './pages/Library';
+import Login from "./pages/Login";
+import Playlists from './pages/Playlists';
+import Search from './pages/Search';
 import { reducerCaseActions } from './utils/constants';
+import { code, refreshAccessToken, saveAuthToken } from './utils/spotify';
 import { useStateProvider } from './utils/stateprovider';
-import { code, saveAuthToken } from './utils/spotify';
 
 function App () {
+  const currentTime = new Date().getTime();
+
   const Stack = createNativeStackNavigator();
   //read and set token state using state provider with reducer
   var [{ token }, dispatch] = useStateProvider();
@@ -21,7 +23,9 @@ function App () {
   const fetchToken = async () => {
     //try to get access token from async storage
     var storedTokenState = await AsyncStorage.getItem("access_token");
-    console.log('storedTokenState: ', storedTokenState)
+    console.log('storedTokenState: ', storedTokenState);
+    const storedRefreshToken = await AsyncStorage.getItem("refresh_token");
+    const storedExpiryTime = await AsyncStorage.getItem("expiry_time");
     //retrieve a token from spotify and save it if there isn't one granted
     if  (storedTokenState == null) {
       if (code) {
@@ -39,10 +43,26 @@ function App () {
         }
       }
     } else {
-      //if there is already a token saved, update the state
-      token = storedTokenState;
-      console.log('app token: ', token)
-      dispatch({ type: reducerCaseActions.SET_TOKEN, token });
+      //if there is already a non-expired token saved, update the state
+      if (storedTokenState && storedExpiryTime && currentTime < parseInt(storedExpiryTime)) {
+        token = storedTokenState;
+        console.log('app token: ', token)
+        dispatch({ type: reducerCaseActions.SET_TOKEN, token });
+      } else if (storedRefreshToken) {
+        // Token has expired, use refresh token to get a new one
+        try {
+          const { access_token, expires_in } = await refreshAccessToken(storedRefreshToken);
+          const newExpiryTime = new Date().getTime() + expires_in * 1000;
+    
+          await AsyncStorage.setItem("access_token", access_token);
+          await AsyncStorage.setItem("expiry_time", newExpiryTime.toString());
+    
+          dispatch({ type: reducerCaseActions.SET_TOKEN, token: access_token });
+        } catch (error) {
+          console.error("Failed to refresh token:", error);
+          // Handle error, possibly redirect to login
+        }
+      }
     };
   };
 

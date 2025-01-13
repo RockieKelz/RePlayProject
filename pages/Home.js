@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef } from 'react';
 import { FlatList, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -8,7 +9,7 @@ import { SideBar } from "../components/SideBar";
 import { reducerCaseActions } from "../utils/constants";
 import { fetchNewReleases, fetchProfile, fetchRecentlyPlayed, logOut } from "../utils/spotify";
 import { useStateProvider } from "../utils/stateprovider";
-
+ 
 const Home =  ({navigation}) => {
   const [{ token, featuredPlaylists, newReleases, recentlyplayed, user }, dispatch] = useStateProvider();
   const dataRetrieval = useRef(false);
@@ -25,7 +26,7 @@ const Home =  ({navigation}) => {
             userID:profileData.id, 
             profileImage: profileData.images,
         });
-
+        console.log(await AsyncStorage.getItem("refresh_token"));
         var recentData = await fetchRecentlyPlayed(token);
         dispatch({ 
           type: reducerCaseActions.SET_RECENTLYPLAYED, 

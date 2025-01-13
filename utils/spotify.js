@@ -65,7 +65,7 @@ export const handleLoginAuth =async ()=>{
 /*=======================================================
 =            Token Logic            =
 =======================================================*/
-
+const SPOTIFY_API_TOKEN_URL = "https://accounts.spotify.com/api/token";
 //get the access token from spotify 
 export async function getAccessToken() {
   let verifier = await AsyncStorage.getItem("verifier");
@@ -77,26 +77,76 @@ export async function getAccessToken() {
   params.append("redirect_uri", redirectUri);
   params.append("code_verifier", verifier);
 
-  const result = await fetch("https://accounts.spotify.com/api/token", {
+  const result = await fetch(`${SPOTIFY_API_TOKEN_URL}`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: params
   });
 
   const access_token = await result.json();
-  return access_token.access_token;
+  return access_token;
 }
 
 //save the access token using async storage
 export const saveAuthToken = async () => {
     const accessToken = await getAccessToken();
     try {
-      await AsyncStorage.setItem("access_token", accessToken);
+      await AsyncStorage.setItem("access_token", accessToken.access_token);
+      await AsyncStorage.setItem("token_expires_in", accessToken.expires_in);
+      await AsyncStorage.setItem("refresh_token", accessToken.refresh_token);
     } catch {
       console.log(error);
     }  
 }
+export const getRefreshToken = async () => {
+  const refreshToken = await AsyncStorage.getItem("refresh_token");
+  const payload = {
+    method:'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+        client_id: clientId
+      }),
+  }
+  const body = await fetch(url, payload);
+  const response = await body.json();
+  try {
+    await AsyncStorage.setItem("access_token", response.accessToken);
+    if(response.refresh_token) {
+    await AsyncStorage.setItem("refresh_token", response.refreshToken); }
+  } catch {
+    console.log(error);
+  }
+}
+export const refreshAccessToken = async (refreshToken) => {
+  let verifier = await AsyncStorage.getItem("verifier");
 
+  const params = new URLSearchParams();
+  params.append("client_id", clientId);
+  params.append("grant_type", 'refresh_token');
+  params.append('refresh_token', refreshToken);
+  params.append("code_verifier", verifier);
+  
+  const response = await fetch(`${SPOTIFY_API_TOKEN_URL}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to refresh access token');
+  }
+
+  const data = await response.json();
+  return {
+    access_token: data.access_token,
+    expires_in: data.expires_in,
+  };
+};
 export const logOut = () => {
   AsyncStorage.removeItem('token_timestamp')
   AsyncStorage.removeItem('access_token')
