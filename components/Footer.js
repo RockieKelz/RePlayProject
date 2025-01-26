@@ -1,15 +1,121 @@
-import React, { useState } from "react";
-import { LinearGradient } from 'expo-linear-gradient'
-import { Pressable, StyleSheet, View } from 'react-native';
-import { BsPlayFill, BsPauseFill, BsShuffle, BsRepeat, BsVolumeDown, BsVolumeUp} from "react-icons/bs";
+import Slider from '@react-native-community/slider';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useState } from "react";
+import { BsPauseFill, BsPlayFill, BsRepeat, BsShuffle, BsVolumeUp } from "react-icons/bs";
 import { CgPlayTrackNext, CgPlayTrackPrev } from "react-icons/cg";
-import  Slider from '@react-native-community/slider';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { useStateProvider } from "../utils/stateprovider";
 
 export function Footer() {    
-    const [isPlaying, setIsPlaying] = useState(false); //for toggling play and pause icon
+    let [isPlaying, setIsPlaying] = useState(false); //for toggling play and pause icon
     const [volume, setVolume] = useState(50);  //for volume control slider
     const [progress, setProgress] = useState(0) //for playback progress
     const [duration, setDuration] = useState(0) //for duration of song
+    const [deviceID, setDeviceId] = useState(false);
+    const [lastPlayedTrack, setLastPlayedTrack] = useState(null);
+    const [is_paused, setPaused] = useState(false);
+    const [{ token, recentlyplayed, currentlyPlaying, artists, user }, dispatch] = useStateProvider();
+    
+    useEffect(() => {
+        const getRecentlyPlayedTracks = async () => {
+            if (token && recentlyplayed) {
+                console.log(recentlyplayed);
+                setLastPlayedTrack(recentlyplayed.items[0].track);
+            }
+        };
+        getRecentlyPlayedTracks();
+        console.log("Playing?:", isPlaying);
+
+    }, [recentlyplayed])
+    useEffect(() => {
+
+        const script = document.createElement("script");
+        script.src = "https://sdk.scdn.co/spotify-player.js";
+        script.async = true;
+    
+        document.body.appendChild(script);
+    
+        window.onSpotifyWebPlaybackSDKReady = () => {
+    
+            const player = new window.Spotify.Player({
+                name: 'RePlay-er',
+                getOAuthToken: cb => { cb(token); },
+                volume: 0.5
+            });
+        
+            player.addListener('ready', ({ device_id }) => {
+                console.log('Ready with Device ID', device_id);
+                setDeviceId(device_id);
+            });
+    
+            player.addListener('not_ready', ({ device_id }) => {
+                console.log('Device ID has gone offline', device_id);
+            });
+
+            player.addListener('initialization_error', ({ message }) => {
+                console.error(message);
+            });
+
+            player.addListener('authentication_error', ({ message }) => {
+                console.error(message);
+            });
+
+            player.addListener('account_error', ({ message }) => {
+                console.error(message);
+            });
+              
+            player.getCurrentState().then(state => {
+            if (!state) {
+                console.error('User is not playing music through the Web Playback SDK');
+                return;
+            }
+            
+            var current_track = state.track_window.current_track;
+            var next_track = state.track_window.next_tracks[0];
+            
+            console.log('Currently Playing', current_track);
+            console.log('Playing Next', next_track);
+            });
+            
+            player.connect().then(success => {
+                if (success) {
+                  console.log('The Web Playback SDK successfully connected to Spotify!');
+                }
+              })
+        };
+    }, []);
+    const play = async () => {
+        setIsPlaying(!isPlaying);
+        if (!isPlaying) {
+        const response = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceID}`, {
+            method: 'PUT',
+            body: JSON.stringify({ uris: [lastPlayedTrack.uri] }),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+    
+        if (response.ok) {
+            console.log('Track is playing!');
+        } else {
+            console.error('Error playing track:', response);
+        }
+    } else {
+        const response = await fetch(`https://api.spotify.com/v1/me/player/pause`, { 
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (response.ok) {
+            console.log('Track is paused!');
+        } else {
+            console.error('Error pausing track:', response);
+        }
+    }
+}
 
     return (
     <View style = {[Container.background,]}>
@@ -29,18 +135,18 @@ export function Footer() {
                         </View>
                     </Pressable>
                     <Pressable>
-                        <View style = {[Container.playIcon, ]}>
+                        <View style = {[Container.playerIcon, ]}>
                             <CgPlayTrackPrev style = {{ fontSize: 26}} />
                         </View>
                     </Pressable>
                     {/* Toggle play/pause based on playback*/}
                     <Pressable 
                         style={[Container.playButton, ]}
-                        onPress={() => setIsPlaying(!isPlaying)}>
+                        onPress={() => { play() }} >
                         <View style={[Container.playIcon, ]}>
-                            {isPlaying ? <BsPauseFill /> : <BsPlayFill />}
+                            {!isPlaying ? <BsPlayFill /> : <BsPauseFill />}
                         </View>
-                    </Pressable>
+                    </Pressable> 
                     <Pressable>
                         <View style = {[Container.playerIcon, ]}>
                             <CgPlayTrackNext style = {{ fontSize: 26}} />
