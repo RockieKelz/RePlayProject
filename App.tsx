@@ -23,15 +23,16 @@ function App () {
   const fetchToken = async () => {
     //try to get access token from async storage
     var storedTokenState = await AsyncStorage.getItem("access_token");
-    console.log('storedTokenState: ', storedTokenState);
     const storedRefreshToken = await AsyncStorage.getItem("refresh_token");
-    const storedExpiryTime = await AsyncStorage.getItem("expiry_time");
+    const storedExpiryTime = await AsyncStorage.getItem("token_expires_in");
+
     //retrieve a token from spotify and save it if there isn't one granted
-    if  (storedTokenState == null) {
+    if  (storedTokenState === null || storedTokenState === 'undefined') {
       if (code) {
         try { 
           // Check if the ref's value is true before running saveAuthToken
             await saveAuthToken();
+
             const token = await AsyncStorage.getItem("access_token");
             if (token !== null) { 
               //dispatch the action to set the token and update state
@@ -48,14 +49,14 @@ function App () {
         token = storedTokenState;
         console.log('app token: ', token)
         dispatch({ type: reducerCaseActions.SET_TOKEN, token });
-      } else if (storedRefreshToken) {
+      } else {
         // Token has expired, use refresh token to get a new one
         try {
           const { access_token, expires_in } = await refreshAccessToken(storedRefreshToken);
           const newExpiryTime = new Date().getTime() + expires_in * 1000;
     
           await AsyncStorage.setItem("access_token", access_token);
-          await AsyncStorage.setItem("expiry_time", newExpiryTime.toString());
+          await AsyncStorage.setItem("token_expires_in", newExpiryTime.toString());
     
           dispatch({ type: reducerCaseActions.SET_TOKEN, token: access_token });
         } catch (error) {
@@ -74,7 +75,7 @@ function App () {
     if (token) {
       console.log('token: ', token)
     }
-  }, []);
+  }, [token]);
 
   return (
       token ?

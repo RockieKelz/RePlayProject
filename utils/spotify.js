@@ -98,47 +98,24 @@ export const saveAuthToken = async () => {
       console.log(error);
     }  
 }
-export const getRefreshToken = async () => {
-  const refreshToken = await AsyncStorage.getItem("refresh_token");
-  const payload = {
-    method:'POST',
-    headers: {'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: new URLSearchParams({
-        grant_type: 'refresh_token',
-        refresh_token: refreshToken,
-        client_id: clientId
-      }),
-  }
-  const body = await fetch(url, payload);
-  const response = await body.json();
-  try {
-    await AsyncStorage.setItem("access_token", response.accessToken);
-    if(response.refresh_token) {
-    await AsyncStorage.setItem("refresh_token", response.refreshToken); }
-  } catch {
-    console.log(error);
-  }
-}
 export const refreshAccessToken = async (refreshToken) => {
-  let verifier = await AsyncStorage.getItem("verifier");
+  console.log(refreshToken);
 
   const params = new URLSearchParams();
   params.append("client_id", clientId);
   params.append("grant_type", 'refresh_token');
   params.append('refresh_token', refreshToken);
-  params.append("code_verifier", verifier);
   
   const response = await fetch(`${SPOTIFY_API_TOKEN_URL}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: params,
+    body: params.toString(),
   });
 
   if (!response.ok) {
-    throw new Error('Failed to refresh access token');
+    console.log(response.statusText);
   }
 
   const data = await response.json();
@@ -150,6 +127,7 @@ export const refreshAccessToken = async (refreshToken) => {
 export const logOut = () => {
   AsyncStorage.removeItem('token_timestamp')
   AsyncStorage.removeItem('access_token')
+  AsyncStorage.removeItem('token_expires_in')
   AsyncStorage.removeItem('refresh_token')
   AsyncStorage.removeItem('session')
   window.location.href='/'
