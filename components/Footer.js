@@ -118,6 +118,25 @@ export function Footer() {
         }
     }
 }
+const skip = async (direction) =>{
+    if (direction == "next")
+    {
+        const response = await fetch(`https://api.spotify.com/v1/me/player/next?device_id=${deviceID}`, { 
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+            
+    } else if (direction == "prev") {
+        const response = await fetch(`https://api.spotify.com/v1/me/player/previous?device_id=${deviceID}`, { 
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+    }
+}
 
     return (
     <View style = {[Container.background,]}>
@@ -136,7 +155,8 @@ export function Footer() {
                             <BsShuffle style = {{ fontSize: 18}}/>
                         </View>
                     </Pressable>
-                    <Pressable>
+                    <Pressable 
+                        onPress = {() => skip("prev")}>
                         <View style = {[Container.playerIcon, ]}>
                             <CgPlayTrackPrev style = {{ fontSize: 26}} />
                         </View>
@@ -149,7 +169,8 @@ export function Footer() {
                             {!isPlaying ? <BsPlayFill /> : <BsPauseFill />}
                         </View>
                     </Pressable> 
-                    <Pressable>
+                    <Pressable
+                        onPress = {() => skip("next")}>
                         <View style = {[Container.playerIcon, ]}>
                             <CgPlayTrackNext style = {{ fontSize: 26}} />
                         </View>
