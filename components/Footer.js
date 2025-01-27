@@ -11,16 +11,18 @@ export function Footer() {
     const [volume, setVolume] = useState(50);  //for volume control slider
     const [progress, setProgress] = useState(0) //for playback progress
     const [duration, setDuration] = useState(0) //for duration of song
-    const [deviceID, setDeviceId] = useState(false);
-    const [lastPlayedTrack, setLastPlayedTrack] = useState(null);
-    const [is_paused, setPaused] = useState(false);
-    const [{ token, recentlyplayed, currentlyPlaying, artists, user }, dispatch] = useStateProvider();
+    const [deviceID, setDeviceId] = useState(false); //for connecting RePlay Player with Spotify player
+    /*TO DO: UPDATE TO USE REDUCER & STATE INSTEAD OF RECENTLY PLAYED TRACK */
+    const [currentTrack, setCurrentTrack] = useState(null); 
+    const [{ token, recentlyplayed, currentlyPlaying, artists }, dispatch] = useStateProvider();
     
     useEffect(() => {
+        /* TO DO: 
+            CHANGE SECTION TO GET CURRENT QUEUE DATA */
         const getRecentlyPlayedTracks = async () => {
             if (token && recentlyplayed) {
                 console.log(recentlyplayed);
-                setLastPlayedTrack(recentlyplayed.items[0].track);
+                setCurrentTrack(recentlyplayed.items[0].track);
             }
         };
         getRecentlyPlayedTracks();
@@ -28,7 +30,8 @@ export function Footer() {
 
     }, [recentlyplayed])
     useEffect(() => {
-
+        if (!deviceID){
+        //Create web playback instance
         const script = document.createElement("script");
         script.src = "https://sdk.scdn.co/spotify-player.js";
         script.async = true;
@@ -36,7 +39,7 @@ export function Footer() {
         document.body.appendChild(script);
     
         window.onSpotifyWebPlaybackSDKReady = () => {
-    
+            //Create the Spotify Player 
             const player = new window.Spotify.Player({
                 name: 'RePlay-er',
                 getOAuthToken: cb => { cb(token); },
@@ -45,7 +48,7 @@ export function Footer() {
         
             player.addListener('ready', ({ device_id }) => {
                 console.log('Ready with Device ID', device_id);
-                setDeviceId(device_id);
+                setDeviceId(device_id); 
             });
     
             player.addListener('not_ready', ({ device_id }) => {
@@ -63,33 +66,31 @@ export function Footer() {
             player.addListener('account_error', ({ message }) => {
                 console.error(message);
             });
-              
-            player.getCurrentState().then(state => {
-            if (!state) {
-                console.error('User is not playing music through the Web Playback SDK');
-                return;
-            }
-            
-            var current_track = state.track_window.current_track;
-            var next_track = state.track_window.next_tracks[0];
-            
-            console.log('Currently Playing', current_track);
-            console.log('Playing Next', next_track);
-            });
-            
+            player.addListener('player_state_changed', ( state => {
+                if (!state) {
+                    return;
+                }
+                console.log(`Player state changed: paused = ${state.paused}`);
+                setIsPlaying(state.paused ? false : true);
+
+            })); 
+
             player.connect().then(success => {
                 if (success) {
                   console.log('The Web Playback SDK successfully connected to Spotify!');
                 }
               })
-        };
+        };}
     }, []);
+    /* Toggle Player's Playback */
     const play = async () => {
-        setIsPlaying(!isPlaying);
-        if (!isPlaying) {
+        const newIsPlaying = !isPlaying; //immediately change isPlaying
+        setIsPlaying(newIsPlaying); 
+    
+        if (newIsPlaying == true) {
         const response = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceID}`, {
             method: 'PUT',
-            body: JSON.stringify({ uris: [lastPlayedTrack.uri] }),
+            data: JSON.stringify({ context_uri: `spotify:album:${currentTrack.album.uri}` }), //URI for playing the current track album
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -111,6 +112,7 @@ export function Footer() {
         });
         if (response.ok) {
             console.log('Track is paused!');
+
         } else {
             console.error('Error pausing track:', response);
         }
