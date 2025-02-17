@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~3.2.3",
+    "@fanchenbao/react-native-scroll-indicator": "^0.4.0",
     "@react-native-async-storage/async-storage": "^2.0.0",
     "@react-native-community/slider": "^4.5.3",
     "@react-navigation/native": "^6.1.18",

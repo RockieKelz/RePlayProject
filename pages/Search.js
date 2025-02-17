@@ -1,7 +1,7 @@
+import { ScrollViewIndicator } from '@fanchenbao/react-native-scroll-indicator';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from "react";
 import { Dimensions, FlatList, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import ScrollViewIndicator from 'react-native-scroll-indicator';
 import { FontAwesome } from 'react-native-vector-icons';
 import { Footer } from "../components/Footer";
 import HorizontalScrollWithArrows from '../components/HorizontalScrollArrows';
@@ -107,9 +107,9 @@ const Search= ({navigation}) =>  {
           locations={[0.02, 0.27, 0.84,0.96,0.99]}
           style={styles.linearGradient}>
         <ScrollViewIndicator
-            shouldIndicatorHide={false}
-            flexibleIndicator={false}
-            scrollIndicatorStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.6)' }}
+            horizontal={false}
+            indStyle={{backgroundColor: 'rgba(255, 255, 255, 0.2)', width: 7}}
+            containerStyle={{ height : '100%' }}
             >
               
           {/*search bar row*/}

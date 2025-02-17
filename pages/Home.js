@@ -1,8 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ScrollViewIndicator } from '@fanchenbao/react-native-scroll-indicator';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef } from 'react';
 import { FlatList, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
-import ScrollViewIndicator from 'react-native-scroll-indicator';
 import { Footer } from "../components/Footer";
 import { MusicCard } from "../components/MusicCard";
 import { SideBar } from "../components/SideBar";
@@ -26,7 +25,6 @@ const Home =  ({navigation}) => {
             userID:profileData.id, 
             profileImage: profileData.images,
         });
-        console.log(await AsyncStorage.getItem("refresh_token"));
         var recentData = await fetchRecentlyPlayed(token);
         dispatch({ 
           type: reducerCaseActions.SET_RECENTLYPLAYED, 
@@ -57,8 +55,8 @@ const Home =  ({navigation}) => {
   }
 
   return (
-    <SafeAreaView style={[styles.container, {flexDirection: 'column'}]}>
-      <View style= {[styles.container, styles.subContainer]}>
+    <SafeAreaView style={[styles.container]}>
+      <View style= {[styles.subContainer]}>
         <SideBar navigation={navigation} />
         <LinearGradient 
               colors={['rgba(0, 17, 236, 1)',"rgba(12,90,249,1)", 'rgba(48,138,239,1)', 'rgba(24,198,143,1)','rgba(0,255,96,1)']} 
@@ -67,10 +65,10 @@ const Home =  ({navigation}) => {
               locations={[0.02, 0.27, 0.84,0.96,0.99]}
               style={styles.linearGradient}>
           <ScrollViewIndicator
-            shouldIndicatorHide={false}
-            flexibleIndicator={false}
-            scrollIndicatorStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.6)' }}
-            >
+          horizontal={false}
+          indStyle={{backgroundColor: 'rgba(255, 255, 255, 0.3)', width: 7}}
+          containerStyle={{ height : '100%' }}
+          >
             {/*Welcome Text*/}            
             <View style={[styles.text]}>
                 <Text style={[styles.title]}> Welcome
@@ -82,11 +80,17 @@ const Home =  ({navigation}) => {
                 {/*display recently played songs if there are any*/}
                 {recentlyplayed && recentlyplayed.items ? (
                   <>
-                <Text style={[ styles.title]}>
+                <Text style={[ styles.subtitle]}>
                    Recently Played Songs
                 </Text>
                 {/* scroll box that will hold 2 rows of recently played song data cards*/}
-                <ScrollView horizontal> 
+                <ScrollViewIndicator
+                   /* *** TO DO: 
+                   CHANGE TO HORIZONTAL SCROLL WITH ARROWS *** */
+                  horizontal={true}
+                  indStyle={{backgroundColor: 'rgba(255, 255, 255, 0.3)', width: 7}}
+                  containerStyle={{ width : '100%' }}
+                  >
                   <>
                     <View style={[ styles.cardContainer]}>
                       <FlatList
@@ -103,17 +107,23 @@ const Home =  ({navigation}) => {
                       />
                     </View>
                   </>
-                </ScrollView>
+                </ScrollViewIndicator>
                 </>
                   ) : (<></>)}
                   {/*display new releases if there are any*/}
                 {newReleases && newReleases.albums ? (
                   <>
-                <Text style={[styles.title]}>
+                <Text style={[styles.subtitle]}>
                    New Releases
                 </Text>
                 {/* scroll box that will hold 2 rows of new release data cards*/}
-                <ScrollView horizontal> 
+                <ScrollViewIndicator
+                  /* *** TO DO: 
+                   CHANGE TO HORIZONTAL SCROLL WITH ARROWS *** */
+                  horizontal={true}
+                  indStyle={{backgroundColor: 'rgba(255, 255, 255, 0.3)', width: 7}}
+                  containerStyle={{ width : '100%' }}
+                  >
                   <>
                   <View style={[ styles.cardContainer]}>
                       <FlatList
@@ -130,11 +140,13 @@ const Home =  ({navigation}) => {
                       />
                     </View>
                   </>
-                </ScrollView>
+                </ScrollViewIndicator>
                 </>
                   ) : (<></>)}
 
-                {/*display featured playlists if there are any*/}
+                {/*display featured playlists if there are any
+                *************DEPRECIATED*************
+                CHANGE TO USERS SAVED TRACKS & GLOBAL CHARTS */}
                 {featuredPlaylists && featuredPlaylists.playlists ? (
                 <>
                 <Text style={[styles.title]}>
@@ -184,6 +196,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'blue',
+    flexDirection: 'column'
   },
   /*view that will hold side menu and main content*/
   subContainer: {
@@ -218,6 +231,13 @@ const styles = StyleSheet.create({
     alignItems:'left', 
     justifyContent:'center', 
     flex:1
+  },
+  subtitle:{
+    paddingTop: 30, 
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    color: '#fff',
   },
   /*logout */
   btn: {

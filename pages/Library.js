@@ -1,7 +1,7 @@
+import { ScrollViewIndicator } from '@fanchenbao/react-native-scroll-indicator';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, SafeAreaView, Text, useWindowDimensions, View } from 'react-native';
-import { ScrollView } from "react-native-gesture-handler";
 import { Footer } from "../components/Footer";
 import { MusicCard } from "../components/MusicCard";
 import { SideBar } from "../components/SideBar";
@@ -55,7 +55,12 @@ const Library= ({navigation}) => {
           end={[.75, .75]}
           locations={[0.02, 0.27, 0.84,0.96,0.99]}
           style={styles.linearGradient}>
-        <ScrollView>
+        
+        <ScrollViewIndicator
+          horizontal={false}
+          indStyle={{backgroundColor: 'rgba(255, 255, 255, 0.4)', width: 7}}
+          containerStyle={{ height : '100%' }}
+          >
           {/* TITLE */}
           <Text style={styles.title}>Your Library</Text>
           <View style={{paddingTop: 10}}>
@@ -126,7 +131,7 @@ const Library= ({navigation}) => {
           ))}</>)}
         </View>
 
-      </ScrollView>
+      </ScrollViewIndicator>
       </LinearGradient>
       </View>
       <View style={styles.footerLine} />
@@ -144,17 +149,21 @@ const Library= ({navigation}) => {
       backgroundColor: 'blue',
     },
     title:{
-      maxWidth: 190,
-      marginLeft: 25,
-      marginTop: 65,
-      fontFamily: "Segoe UI",
-      fontSize: 25,
+      height: 43,
+      width: 200,
+      fontFamily: "Arial",
+      fontSize: 22,
       fontWeight: '700',
-      letterSpacing: 1,
-      color: '#7001b1',
-      backgroundColor: 'rgba(0,240,215,.25)',
-      borderRadius: 13,
-      paddingLeft: 15,
+      color: 'rgba(112, 1, 177, 1)',
+      backgroundColor: 'rgba(50, 242, 134, 0.77)',  
+      borderTopRightRadius: 12,
+      borderBottomLeftRadius:12,
+      borderBottomRightRadius: 12,  
+      padding: 10,
+      margin: 15,  
+      paddingLeft: 25,
+      marginTop: 35,
+      alignItems: 'left',
     },
     /*view that will hold side menu and main content*/
     subContainer:{
