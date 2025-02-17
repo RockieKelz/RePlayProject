@@ -92,7 +92,8 @@ export const saveAuthToken = async () => {
     const accessToken = await getAccessToken();
     try {
       await AsyncStorage.setItem("access_token", accessToken.access_token);
-      await AsyncStorage.setItem("token_expires_in", accessToken.expires_in);
+      const newExpireTime = new Date().getTime() + accessToken.expires_in * 1000;
+      await AsyncStorage.setItem("token_expires_in", newExpireTime);
       await AsyncStorage.setItem("refresh_token", accessToken.refresh_token);
     } catch {
       console.log(error);
@@ -116,13 +117,23 @@ export const refreshAccessToken = async (refreshToken) => {
 
   if (!response.ok) {
     console.log(response.statusText);
-  }
+    return
+  } else {
+    const data = await response.json();
+    try {
+      await AsyncStorage.setItem("access_token", data.access_token);
+      await AsyncStorage.setItem("refresh_token", data.refresh_token);
+    
+      return {
+        access_token: data.access_token,
+        expires_in: data.expires_in,
+      };
+  } catch {
+    console.log(error);
+    return;
+  } 
+  }  
 
-  const data = await response.json();
-  return {
-    access_token: data.access_token,
-    expires_in: data.expires_in,
-  };
 };
 export const logOut = () => {
   AsyncStorage.removeItem('token_timestamp')

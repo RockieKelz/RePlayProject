@@ -8,7 +8,7 @@ import Login from "./pages/Login";
 import Playlists from './pages/Playlists';
 import Search from './pages/Search';
 import { reducerCaseActions } from './utils/constants';
-import { code, refreshAccessToken, saveAuthToken } from './utils/spotify';
+import { code, logOut, refreshAccessToken, saveAuthToken } from './utils/spotify';
 import { useStateProvider } from './utils/stateprovider';
 
 function App () {
@@ -25,7 +25,6 @@ function App () {
     var storedTokenState = await AsyncStorage.getItem("access_token");
     const storedRefreshToken = await AsyncStorage.getItem("refresh_token");
     const storedExpiryTime = await AsyncStorage.getItem("token_expires_in");
-
     //retrieve a token from spotify and save it if there isn't one granted
     if  (storedTokenState === null || storedTokenState === 'undefined') {
       if (code) {
@@ -47,21 +46,19 @@ function App () {
       //if there is already a non-expired token saved, update the state
       if (storedTokenState && storedExpiryTime && currentTime < parseInt(storedExpiryTime)) {
         token = storedTokenState;
-        console.log('app token: ', token)
         dispatch({ type: reducerCaseActions.SET_TOKEN, token });
       } else {
         // Token has expired, use refresh token to get a new one
         try {
           const { access_token, expires_in } = await refreshAccessToken(storedRefreshToken);
           const newExpiryTime = new Date().getTime() + expires_in * 1000;
-    
-          await AsyncStorage.setItem("access_token", access_token);
           await AsyncStorage.setItem("token_expires_in", newExpiryTime.toString());
     
           dispatch({ type: reducerCaseActions.SET_TOKEN, token: access_token });
         } catch (error) {
           console.error("Failed to refresh token:", error);
-          // Handle error, possibly redirect to login
+          dispatch({type: reducerCaseActions.LOGOUT});
+          logOut();
         }
       }
     };
